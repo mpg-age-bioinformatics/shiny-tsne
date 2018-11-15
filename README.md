@@ -1,5 +1,5 @@
 # shiny
-This repos hosts most of our shiny apps
+This repo hosts most of our shiny apps
 
 ## Contributing
 
