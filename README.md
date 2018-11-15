@@ -3,7 +3,7 @@ This repo hosts most of our shiny apps
 
 ## Contributing
 
-Make sure you one folder for each App you wish to contribute.
+Make sure you have one folder for each App you wish to contribute.
 
 Inside that folder we will need a `requirements.R` file which will have to include the installation of all required libraries.
 
