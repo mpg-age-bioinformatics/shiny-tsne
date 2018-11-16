@@ -13,11 +13,11 @@ library(shiny)
 shinyUI( fluidPage(
   sidebarLayout(
     sidebarPanel(
-      fileInput("file1", "Choose CSV File",
-                accept = c(
-                  "text/csv",
-                  "text/comma-separated-values,text/plain",
-                  ".csv")
+      fileInput("file1", "Choose File",
+                accept = c("text/csv",
+                          "text/comma-separated-values,text/plain",
+                          ".csv",
+                          ".xlsx")
       ),
       radioButtons("filetype", 'Please select the input file type', choices = c('auto' = 'auto', 
                                                                                 "excel" = 'xlsx',  
@@ -25,6 +25,8 @@ shinyUI( fluidPage(
                                                                                 'comma-seperated' = ',', 
                                                                                 'semicolon-separated' = ';'), inline = TRUE),
       checkboxInput("header", "Header", TRUE),
+      a(href = "https://raw.githubusercontent.com/mpg-age-bioinformatics/shiny/master/VennDiagram/venndiagram_example.xlsx", "Example input"),
+      hr(),
       textInput('venncolors', "Comma seperated list of colors", value = 'gray'),
       a(href = "http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf", "R-colors"),
       hr(),
