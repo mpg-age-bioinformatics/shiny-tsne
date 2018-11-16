@@ -5,6 +5,7 @@ This repo hosts most of our shiny apps
 
 Make sure you have one folder for each App you wish to contribute.
 
+### Apps
 Inside that folder we will need a `requirements.R` file which will have to include the installation of all required libraries.
 
 Example of a `requirements.R` file:
@@ -17,6 +18,8 @@ devtools::install_github('IRkernel/IRkernel')
 source("http://bioconductor.org/biocLite.R")
 biocLite("Biobase")
 ```
+
+### Development environment 
 
 Please develop your apps in the same enviroment where they will be hosted.
 
@@ -54,3 +57,5 @@ sudo rstudio-server stop
 You can stop and remove the container with `docker stop shiny ; docker rm shiny`.
 
 The image can be removed with `docker rmi shiny`.
+
+If *system libraries* are required please add them to the `Dockerfile`.
