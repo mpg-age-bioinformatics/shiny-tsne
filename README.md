@@ -7,7 +7,7 @@ Make sure you have one folder for each App you wish to contribute.
 
 ### Apps
 
-Please check the [VennDiagram App](https://github.com/mpg-age-bioinformatics/shiny/tree/master/VennDiagram) for an a complete running example.
+Please check the [VennDiagram App](https://github.com/mpg-age-bioinformatics/shiny/tree/master/VennDiagram) for a complete running example.
 
 Inside that folder we will need a `requirements.R` file which will have to include the installation of all required libraries.
 
