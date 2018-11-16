@@ -50,3 +50,7 @@ For stopping the server use:
 ```
 sudo rstudio-server stop
 ```
+
+You can stop and remove the container with `docker stop shiny ; docker rm shiny`.
+
+The image can be removed with `docker rmi shiny`.
