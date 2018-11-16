@@ -6,7 +6,7 @@
 # 
 #    http://shiny.rstudio.com/
 #
-
+.libPaths("/srv/shiny-server/VennDiagram/libs")
 library(shiny)
 
 # Define UI for application that draws a histogram

@@ -6,7 +6,7 @@
 # 
 #    http://shiny.rstudio.com/
 #
-
+.libPaths("/srv/shiny-server/VennDiagram/libs")
 library(shiny)
 library(VennDiagram)
 library(xlsx)

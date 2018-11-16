@@ -1,5 +1,7 @@
 # install libraries for VennDiagram
 
+.libPaths("/srv/shiny-server/VennDiagram/libs")
+
 if(!require(shiny)){
   install.packages("shiny", dependencies = TRUE)
   library(shiny)
