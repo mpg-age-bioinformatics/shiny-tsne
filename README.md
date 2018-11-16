@@ -6,11 +6,15 @@ This repo hosts most of our shiny apps
 Make sure you have one folder for each App you wish to contribute.
 
 ### Apps
+
+Please check the [VennDiagram App](https://github.com/mpg-age-bioinformatics/shiny/tree/master/VennDiagram) for an a complete running example.
+
 Inside that folder we will need a `requirements.R` file which will have to include the installation of all required libraries.
 
 Example of a `requirements.R` file:
 
 ```
+.libPaths("/srv/shiny-server/exampleApp/libs")
 install.packages(c('repr', 'IRdisplay', 'evaluate', 'crayon', 'pbdZMQ', 'devtools', 'uuid', 'digest'), \
 repos=c('https://cloud.r-project.org/'), \
 dependencies=TRUE )"
@@ -47,7 +51,7 @@ sudo rstudio-server start
 ```
 User/Password: `mpiage/bioinf`
 
-The RStudio server will now be accessible over http://localhost:8787.
+The RStudio server will now be accessible over http://localhost:8787 and the shiny repo available in `/srv/shiny-server/`.
 
 For stopping the server use:
 ```
