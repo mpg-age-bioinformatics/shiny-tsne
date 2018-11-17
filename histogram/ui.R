@@ -1,11 +1,4 @@
 .libPaths("/srv/shiny-server/histogram/libs")
-gitversion <- function(){ 
-  git<-read.csv("/srv/shiny-server/.git/refs/heads/master", header=FALSE)
-  git<-git$V1
-  git<-toString(git[1])
-  git<-substr(git, 1, 7)
-  return(git)
-}
 library(shiny)
 # Define UI for application that draws a histogram
 shinyUI( fluidPage(
@@ -44,13 +37,12 @@ shinyUI( fluidPage(
       #textOutput("testtext"),
       plotOutput("histogram", height = "500px", width = "500px"),
       downloadButton('downloadPlot', 'Download Plot'),
-      br(),br(),
+      br(), br(),
       p("This App uses R's ", code('hist'), " function. For more information read the respective documentation in ",
         a("rdocumentation.org", href = "https://www.rdocumentation.org/packages/graphics/versions/3.5.1/topics/hist"),
         "and wikipedia's entry for ", a("histogram.",href="https://en.wikipedia.org/wiki/Histogram" )),
-      br(),
       p("Please keep the version tag on all downloaded files."),
-      p("Version ", strong(gitversion()))
+      htmlOutput('appversion')
       )
   )
 ))

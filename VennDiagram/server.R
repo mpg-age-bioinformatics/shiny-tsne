@@ -138,4 +138,9 @@ shinyServer(function(input, output) {
       }
     }
   )
+  
+  output$appversion <- renderText ({ 
+    paste0('App version: <b>',gitversion(),'</b>')
+  }
+  )
 })

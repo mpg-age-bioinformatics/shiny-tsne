@@ -11,7 +11,7 @@ futile.logger::flog.threshold(futile.logger::ERROR, name = "HistogramLogger")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
-
+  
   # reformat input data
   plot.data <- reactive({
     inFile <- input$file1
@@ -87,9 +87,6 @@ shinyServer(function(input, output, session) {
   output$histogram <- renderPlot({
     inFile <- input$file1
     req(inFile)
-    #data<-plot.data()
-    #req<-input$file1
-    #req(input$column)
     
     xlim<-plot.xlim()
     if (is.null(xlim))({ xlim=range(plot.data()) })
@@ -121,6 +118,8 @@ shinyServer(function(input, output, session) {
     filename = function(){
       paste0('Histogram.',gitversion(),'.pdf')
     },
+    appversion<-gitversion(),
+    
     content = function(filename){
       # open device
       pdf(filename)
@@ -149,6 +148,11 @@ shinyServer(function(input, output, session) {
 
       # close device
       dev.off()
+    }
+  )
+  
+  output$appversion <- renderText ({ 
+    paste0('App version: <b>',gitversion(),'</b>')
     }
   )
 })

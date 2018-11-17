@@ -7,13 +7,6 @@
 #    http://shiny.rstudio.com/
 #
 .libPaths("/srv/shiny-server/VennDiagram/libs")
-gitversion <- function(){ 
-  git<-read.csv("/srv/shiny-server/.git/refs/heads/master", header=FALSE)
-  git<-git$V1
-  git<-toString(git[1])
-  git<-substr(git, 1, 7)
-  return(git)
-}
 library(shiny)
 
 # Define UI for application that draws a histogram
@@ -64,9 +57,8 @@ shinyUI( fluidPage(
       p("This App uses the", code('VennDiagram'), " package. For more information read the respective documentation in ",
         a("cran", href = "https://cran.r-project.org/web/packages/VennDiagram/index.html"),
         "and wikipedia's entry for ", a("venn diagram.",href="https://en.wikipedia.org/wiki/Venn_diagram" )),
-      br(),
       p("Please keep the version tag on all downloaded files."),
-      p("Version ", strong(gitversion()))
+      htmlOutput('appversion')
     )
   )
 ))
