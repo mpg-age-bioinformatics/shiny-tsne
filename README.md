@@ -32,8 +32,29 @@ Always add a small documentation to your `ui` eg.:
       br(),br(),
       p("This App uses R's ", code('hist'), " function. For more information read the respective documentation in ",
         a("rdocumentation.org", href = "https://www.rdocumentation.org/packages/graphics/versions/3.5.1/topics/hist"),
-        "and wikipedia's entry for ", a("histogram.",href="https://en.wikipedia.org/wiki/Histogram" ))
+        "and wikipedia's entry for ", a("histogram.",href="https://en.wikipedia.org/wiki/Histogram" )),
+      br(),
+      p("Please keep the version tag on all downloaded files."),
+      p("Version ", strong(gitversion()))
       )
+```
+
+Please notice the `Version` paragraph which makes use of the `gitversion()` function:
+```
+gitversion <- function(){ 
+  git<-read.csv("/srv/shiny-server/.git/refs/heads/master", header=FALSE)
+  git<-git$V1
+  git<-toString(git[1])
+  git<-substr(git, 1, 7)
+  return(git)
+}
+```
+Please make sure that all files downloaded by the user containt the version tag eg.:
+```
+    # specify the output file name
+    filename = function(){
+      paste0('Histogram.',gitversion(),'.pdf')
+    }
 ```
 
 ### Development environment 
