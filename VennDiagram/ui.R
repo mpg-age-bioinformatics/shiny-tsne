@@ -16,6 +16,7 @@ shinyUI( fluidPage(
       fileInput("file1", "Choose File",
                 accept = c("text/csv",
                           "text/comma-separated-values,text/plain",
+                          ".tsv",
                           ".csv",
                           ".xlsx")
       ),

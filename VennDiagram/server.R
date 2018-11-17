@@ -21,7 +21,7 @@ shinyServer(function(input, output) {
     
     if (is.null(inFile))
       return(NULL)
-    filetype_map <- c("xlsx" = 'xlsx',  'tsv' = '\t', 'csv' = ',')
+    filetype_map <- c("xlsx" = 'xlsx',  'tsv' = '\t', 'csv' = ',', 'txt'=" ")
     if(filetype == 'auto'){
       file_extension =  unlist(strsplit(inFile$datapath, '[.]'))[length(unlist(strsplit(inFile$datapath, '[.]')))]
       if(file_extension %in% names(filetype_map)){
