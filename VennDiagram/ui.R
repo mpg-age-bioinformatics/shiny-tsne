@@ -52,7 +52,11 @@ shinyUI( fluidPage(
       plotOutput("venn", height = "500px", width = "500px"),
       downloadButton('downloadPlot', 'Download Plot'),
       tableOutput("overlap"),
-      downloadButton('downloadTable', 'Download Table')
+      downloadButton('downloadTable', 'Download Table'),
+      br(),br(),
+      p("This App uses the", code('VennDiagram'), " package. For more information read the respective documentation in ",
+        a("cran", href = "https://cran.r-project.org/web/packages/VennDiagram/index.html"),
+        "and wikipedia's entry for ", a("venn diagram.",href="https://en.wikipedia.org/wiki/Venn_diagram" ))
     )
   )
 ))
