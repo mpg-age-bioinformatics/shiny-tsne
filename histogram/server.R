@@ -1,9 +1,17 @@
 .libPaths("/srv/shiny-server/histogram/libs")
+gitversion <- function(){ 
+  git<-read.csv("/srv/shiny-server/.git/refs/heads/master", header=FALSE)
+  git<-git$V1
+  git<-toString(git[1])
+  git<-substr(git, 1, 7)
+  return(git)
+}
 library(shiny)
 futile.logger::flog.threshold(futile.logger::ERROR, name = "HistogramLogger")
+
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
-  
+
   # reformat input data
   plot.data <- reactive({
     inFile <- input$file1
@@ -111,7 +119,7 @@ shinyServer(function(input, output, session) {
     
     # specify file name
     filename = function(){
-      'Histogram.pdf'
+      paste0('Histogram.',gitversion(),'.pdf')
     },
     content = function(filename){
       # open device
