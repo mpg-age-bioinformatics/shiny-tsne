@@ -17,7 +17,7 @@ shinyUI( fluidPage(
                                                                                 'comma-seperated' = ',', 
                                                                                 'semicolon-separated' = ';'), inline = TRUE),
       checkboxInput("header", "Header", TRUE),
-      textInput("column", "Column"),
+      selectInput("column", "Select Column", choices = NULL),
       a(href = "https://raw.githubusercontent.com/mpg-age-bioinformatics/shiny/master/histogram/chol.txt", "Example input"),
       hr(),
       numericInput("lowerx", "X-axis lower limit", NULL),

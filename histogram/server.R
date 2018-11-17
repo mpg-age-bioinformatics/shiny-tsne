@@ -2,17 +2,14 @@
 library(shiny)
 futile.logger::flog.threshold(futile.logger::ERROR, name = "HistogramLogger")
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   
   # reformat input data
   plot.data <- reactive({
     inFile <- input$file1
     filetype <- input$filetype
     
-    if (is.null(inFile))
-      return(NULL)
-    
-    req(input$column)
+    req(inFile)
     
     filetype_map <- c("xlsx" = 'xlsx',  'tsv' = '\t', 'csv' = ',', 'txt'=" ")
     if(filetype == 'auto'){
@@ -33,7 +30,9 @@ shinyServer(function(input, output) {
       D <- read.csv(inFile$datapath, header = input$header, sep = filetype)
     }
     vars <- names(D)
-
+    updateSelectInput(session, "column","Select Column", choices = vars)
+    req(input$column)
+    
     D[D == ''] <- NA
 
     plot.data.tmp <- D[[input$column]]
@@ -79,8 +78,10 @@ shinyServer(function(input, output) {
   # online plot
   output$histogram <- renderPlot({
     inFile <- input$file1
-    if (is.null(inFile))
-      return(NULL)
+    req(inFile)
+    #data<-plot.data()
+    #req<-input$file1
+    #req(input$column)
     
     xlim<-plot.xlim()
     if (is.null(xlim))({ xlim=range(plot.data()) })
