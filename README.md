@@ -59,7 +59,7 @@ sudo rstudio-server stop
 ```
 
 `server.R`, `ui.R`, `requirements.R` should all start with `.libPaths("/srv/shiny-server/<AppName>/libs")` for which you should
-folder called `libs` in your App main folder.
+have a folder called `libs` in your App main folder.
 
 You can stop and remove the container with `docker stop shiny ; docker rm shiny`.
 
