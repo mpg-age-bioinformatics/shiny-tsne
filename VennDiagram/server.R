@@ -7,6 +7,13 @@
 #    http://shiny.rstudio.com/
 #
 .libPaths("/srv/shiny-server/VennDiagram/libs")
+gitversion <- function(){ 
+  git<-read.csv("/srv/shiny-server/.git/refs/heads/master", header=FALSE)
+  git<-git$V1
+  git<-toString(git[1])
+  git<-substr(git, 1, 7)
+  return(git)
+}
 library(shiny)
 library(VennDiagram)
 library(xlsx)
@@ -92,7 +99,7 @@ shinyServer(function(input, output) {
 
     # specify file name
     filename = function(){
-      'VennDiagram.pdf'
+      paste0('VennDiagram.',gitversion(),'.pdf')
     },
     content = function(filename){
       # open device
@@ -112,7 +119,7 @@ shinyServer(function(input, output) {
   )
   output$downloadTable <- downloadHandler(
     filename = function() {
-      paste(input$file1, "overlap.csv", sep = "")
+      paste(input$file1, "overlap.",gitversion(),".csv", sep = "")
     },
     content = function(file) {
       inFile <- input$file1
