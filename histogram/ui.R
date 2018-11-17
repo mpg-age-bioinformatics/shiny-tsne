@@ -1,0 +1,42 @@
+.libPaths("/srv/shiny-server/histogram/libs")
+library(shiny)
+# Define UI for application that draws a histogram
+shinyUI( fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      fileInput("file1", "Choose File",
+                accept = c("text/csv",
+                           "text/comma-separated-values,text/plain",
+                           ".csv",
+                           ".tsv",
+                           ".xlsx")
+      ),
+      radioButtons("filetype", 'Please select the input file type', choices = c('auto' = 'auto', 
+                                                                                "excel" = 'xlsx',  
+                                                                                'tab-separated' = '\t', 
+                                                                                'comma-seperated' = ',', 
+                                                                                'semicolon-separated' = ';'), inline = TRUE),
+      checkboxInput("header", "Header", TRUE),
+      textInput("column", "Column"),
+      a(href = "https://raw.githubusercontent.com/mpg-age-bioinformatics/shiny/master/histogram/chol.txt", "Example input"),
+      hr(),
+      numericInput("lowerx", "X-axis lower limit", NULL),
+      numericInput("upperx", "X-axis upper limit", NULL),
+      numericInput("lowery", "Y-axis lower limit", NULL),
+      numericInput("uppery", "Y-axis upper limit", NULL),
+      textInput("title", "Histogram title", value="Histogram"),
+      textInput("xlabel", "X-axis label"),
+      numericInput("breaks", "Number of breaks", value=NULL),
+      checkboxInput("probability", "Probability", TRUE),
+      checkboxInput("density", "Density", TRUE),
+      sliderInput('linewidth', 'Select line width', min = 0, max = 5, value = 1, step = 0.1),
+      hr(),
+      submitButton('generate plot')
+    ),
+    mainPanel(
+      #textOutput("testtext"),
+      plotOutput("histogram", height = "500px", width = "500px"),
+      downloadButton('downloadPlot', 'Download Plot')
+    )
+  )
+))
