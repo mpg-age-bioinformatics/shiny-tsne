@@ -23,6 +23,19 @@ source("http://bioconductor.org/biocLite.R")
 biocLite("Biobase")
 ```
 
+Always add a small documentation to your `ui` eg.:
+
+```
+    mainPanel(
+      plotOutput("histogram", height = "500px", width = "500px"),
+      downloadButton('downloadPlot', 'Download Plot'),
+      br(),br(),
+      p("This App uses R's ", code('hist'), " function. For more information read the respective documentation in ",
+        a("rdocumentation.org", href = "https://www.rdocumentation.org/packages/graphics/versions/3.5.1/topics/hist"),
+        "and wikipedia's entry for ", a("histogram.",href="https://en.wikipedia.org/wiki/Histogram" ))
+      )
+```
+
 ### Development environment 
 
 Please develop your apps in the same enviroment where they will be hosted.
