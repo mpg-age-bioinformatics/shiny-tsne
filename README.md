@@ -52,7 +52,8 @@ docker run --rm -p 3838:3838 -p 8787:8787 \
 --name shiny shiny
 ```
 
-You can now access your apps with your host's browser over http://localhost:3838. 
+You can now access your apps with your host's browser over http://localhost:3838.
+Your App will have the address http://localhost:3838/AppName.
 
 For starting the R-Studio server you can enter the container by:
 ```
