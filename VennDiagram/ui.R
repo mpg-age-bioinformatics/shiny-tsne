@@ -45,6 +45,8 @@ shinyUI( fluidPage(
       radioButtons("cat.face", "Select Face:", choices = c("plain","bold","italic","bold.italic"), inline = TRUE),
       hr(),
       checkboxInput('table', "Show table", FALSE),
+      hr(),
+      textInput("outfile", "Output file name", value="VennDiagram"),
       submitButton('generate plot')
     ),
     mainPanel(

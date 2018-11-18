@@ -99,7 +99,7 @@ shinyServer(function(input, output) {
 
     # specify file name
     filename = function(){
-      paste0('VennDiagram.',gitversion(),'.pdf')
+      paste0(input$outfile,".",gitversion(),'.pdf')
     },
     content = function(filename){
       # open device
@@ -119,7 +119,7 @@ shinyServer(function(input, output) {
   )
   output$downloadTable <- downloadHandler(
     filename = function() {
-      paste(input$file1, "overlap.",gitversion(),".csv", sep = "")
+      paste(input$outfile,".overlap.",gitversion(),".csv", sep = "")
     },
     content = function(file) {
       inFile <- input$file1

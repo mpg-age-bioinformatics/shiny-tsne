@@ -31,6 +31,7 @@ shinyUI( fluidPage(
       checkboxInput("density", "Density", TRUE),
       sliderInput('linewidth', 'Select line width', min = 0, max = 5, value = 1, step = 0.1),
       hr(),
+      textInput("outfile", "Output file name", value="Histogram"),
       submitButton('generate plot')
     ),
     mainPanel(

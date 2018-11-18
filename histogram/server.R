@@ -118,7 +118,7 @@ shinyServer(function(input, output, session) {
     
     # specify file name
     filename = function(){
-      paste0('Histogram.',gitversion(),'.pdf')
+      paste0(input$outfile,".",gitversion(),'.pdf')
     },
     content = function(filename){
 
