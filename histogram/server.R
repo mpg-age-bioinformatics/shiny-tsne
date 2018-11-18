@@ -50,7 +50,6 @@ shinyServer(function(input, output, session) {
   })
   
   plot.xlim <- reactive({
-    #req(input$column)
     xlim=range(plot.data())
     if (!is.na(input$lowerx)) {
       if (!is.na(input$upperx)) {
