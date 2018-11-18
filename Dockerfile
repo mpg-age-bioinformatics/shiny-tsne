@@ -35,3 +35,6 @@ echo "mpiage:bioinf" | chpasswd ; \
 adduser mpiage sudo
 
 RUN chown -R mpiage: /home/mpiage
+
+# required for XML package in david
+RUN apt-get install -yq libxml2-dev
