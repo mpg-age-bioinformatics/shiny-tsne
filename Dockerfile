@@ -37,4 +37,10 @@ adduser mpiage sudo
 RUN chown -R mpiage: /home/mpiage
 
 # required for XML package in david
-RUN apt-get install -yq libxml2-dev
+RUN apt-get install -yq libxml2-dev && \
+    echo -n | openssl s_client -connect david.ncifcrf.gov:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > ncifcrf.cert && \
+    openssl x509 -in ncifcrf.cert -text && \
+    cp /etc/ssl/certs/java/cacerts cacerts.org && \
+    keytool -import -trustcacerts -keystore cacerts -storepass changeit -noprompt -alias david -file ncifcrf.cert && \
+    cp cacerts /etc/ssl/certs/java/ && \
+    R CMD javareconf
