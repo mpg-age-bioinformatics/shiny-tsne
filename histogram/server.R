@@ -16,7 +16,6 @@ shinyServer(function(input, output, session) {
   plot.data <- reactive({
     inFile <- input$file1
     filetype <- input$filetype
-    
     req(inFile)
     
     filetype_map <- c("xlsx" = 'xlsx',  'tsv' = '\t', 'csv' = ',', 'txt'=" ")
@@ -50,12 +49,13 @@ shinyServer(function(input, output, session) {
   })
   
   plot.xlim <- reactive({
-    xlim=NULL
+    xlim=range(plot.data())
     if (!is.na(input$lowerx)) {
       if (!is.na(input$upperx)) {
         xlim=c(input$lowerx,input$upperx)
       }
     }
+    return(xlim)
   })
   
   plot.ylim<- reactive({
@@ -83,18 +83,11 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  # online plot
-  output$histogram <- renderPlot({
-    inFile <- input$file1
-    req(inFile)
-    
-    xlim<-plot.xlim()
-    if (is.null(xlim))({ xlim=range(plot.data()) })
-    
+  plot.figure<-reactive({
     HT<-hist(plot.data(),
         main=input$title,
         xlab=plot.xlabel(),
-        xlim=xlim,
+        xlim=plot.xlim(),
         ylim=plot.ylim(),
         border="black",
         col="gray",
@@ -102,14 +95,18 @@ shinyServer(function(input, output, session) {
         breaks=plot.breaks(), # number of breakpoints
         prob = input$probability,
         lwd = input$linewidth ) 
-  
+    
     if (isTRUE(input$density)){ 
       if (isTRUE(input$probability)){
         lines(density(plot.data()),lwd = input$linewidth) 
       }
     }
   })
-  
+
+  # online plot
+  output$histogram <- renderPlot({
+    plot.figure()
+  })
   
   # to download plot
   output$downloadPlot <- downloadHandler(
@@ -118,34 +115,28 @@ shinyServer(function(input, output, session) {
     filename = function(){
       paste0('Histogram.',gitversion(),'.pdf')
     },
-    appversion<-gitversion(),
-    
     content = function(filename){
+
       # open device
       pdf(filename)
-      
-      # create plot
-      xlim<-plot.xlim()
-      if (is.null(xlim))({ xlim=range(plot.data()) })
-      
+      # plot
       HT<-hist(plot.data(),
-               main=input$title,
-               xlab=plot.xlabel(),
-               xlim=xlim,
-               ylim=plot.ylim(),
-               border="black",
-               col="gray",
-               las=1, # Rotate the labels on the y axis by adding “las = 1” as an argument. las can be 0, 1, 2 or 3.
-               breaks=plot.breaks(), # number of breakpoints
-               prob = input$probability,
-               lwd = input$linewidth ) 
-      
+        main=input$title,
+        xlab=plot.xlabel(),
+        xlim=plot.xlim(),
+        ylim=plot.ylim(),
+        border="black",
+        col="gray",
+        las=1, # Rotate the labels on the y axis by adding “las = 1” as an argument. las can be 0, 1, 2 or 3.
+        breaks=plot.breaks(), # number of breakpoints
+        prob = input$probability,
+        lwd = input$linewidth ) 
+    
       if (isTRUE(input$density)){ 
         if (isTRUE(input$probability)){
           lines(density(plot.data()),lwd = input$linewidth) 
         }
       }
-
       # close device
       dev.off()
     }

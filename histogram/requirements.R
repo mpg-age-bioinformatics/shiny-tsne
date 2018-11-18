@@ -3,3 +3,6 @@
 if(!require(futile.logger)){
   install.packages("futile.logger", dependencies = TRUE)
   library(futile.logger)
+}
+  
+  
