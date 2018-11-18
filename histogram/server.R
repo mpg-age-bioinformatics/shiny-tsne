@@ -46,9 +46,11 @@ shinyServer(function(input, output, session) {
     class(plot.data.tmp)
     lapply(plot.data.tmp, function(x) x[!is.na(x)])
     plot.data.tmp<-as.numeric(plot.data.tmp)
+    return(plot.data.tmp)
   })
   
   plot.xlim <- reactive({
+    #req(input$column)
     xlim=range(plot.data())
     if (!is.na(input$lowerx)) {
       if (!is.na(input$upperx)) {
@@ -65,6 +67,7 @@ shinyServer(function(input, output, session) {
         ylim=c(input$lowery,input$uppery)
       }
     }
+    return(ylim)
   })
     
   plot.xlabel<-reactive({
@@ -73,6 +76,7 @@ shinyServer(function(input, output, session) {
     } else {
       xlabel=input$xlabel
     }
+    return(xlabel)
   })
 
   plot.breaks<-reactive({
@@ -81,6 +85,7 @@ shinyServer(function(input, output, session) {
     } else {
       breaks=input$breaks
     }
+    return(breaks)
   })
   
   plot.figure<-reactive({
