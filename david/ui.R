@@ -63,7 +63,7 @@ shinyUI( fluidPage(
                                                                                 'comma-seperated' = ',', 
                                                                                 'semicolon-separated' = ';'), inline = TRUE),
       checkboxInput("header", "Header", TRUE),
-      a(href = "https://raw.githubusercontent.com/mpg-age-bioinformatics/shiny/master/histogram/chol.txt", "Example input"),
+      a(href = "https://raw.githubusercontent.com/mpg-age-bioinformatics/shiny/master/david/genes.txt", "Example input"),
       br(),br(),
       textInput("outfile", "Output file name", value="DAVIDws")
       ),
@@ -73,7 +73,7 @@ shinyUI( fluidPage(
       selectInput("background_list", "Select Background Genes Column (optional)", choices = NULL),
       selectInput("background_list_id", "Background Genes ID type (optional)", choices = c("none",ltypes)) ,
       hr(),
-      textInput("registeredmail", "Registered email", value="jorge.boucas@age.mpg.de"),
+      textInput("registeredmail", "Registered email", value=NULL),
       helpText("Please make sure you've registered your email ", a(href = "https://david.ncifcrf.gov/webservice/register.htm", "here" ),"." )
       ),
     column(4,
@@ -86,18 +86,16 @@ shinyUI( fluidPage(
       selectInput("literature_in", "Literature", choices = c('none',literature), multiple = TRUE, selected='none'),
       selectInput("disease_in", "Disease", choices = c('none',disease), multiple = TRUE, selected='none')
       ),
-    column(4,
-      submitButton('Submit')   
-    )
+    column(12,
+           div(style="display:inline-block",submitButton('Submit'),  style="float:right")
+           )
     ),
     mainPanel(
       br(),
       htmlOutput('mapped'),
       br(),
-      downloadButton('downloadTable', 'Cluster Report')),
-      br(), br(),br(),br(), br(),br(),br(),br(),br(),
-      downloadButton('FunctionalAnnotation', 'Functional Annotation'),
-      br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),
+      div(style="display:inline-block", downloadButton('downloadTable', 'Cluster Report'), downloadButton('FunctionalAnnotation', 'Functional Annotation'), style="float:right"),
+      br(),
       p("This App uses the", code('RDAVIDWebService'), " package. For more information read the respective documentation in ",
         a("cran", href = "http://bioconductor.org/packages/release/bioc/html/RDAVIDWebService.html"),
         "and visit ", a("DAVID Web Services page",href="https://david.ncifcrf.gov/content.jsp?file=WS.html"),".",
@@ -109,6 +107,4 @@ shinyUI( fluidPage(
       htmlOutput('appversion')
   )
 )
-
-
-#submitButton('submit')
+)

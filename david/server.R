@@ -112,6 +112,8 @@ shinyServer(function(input, output, session) {
     
     if (is.null(inFile))
       return(NULL)
+    tmp<-target.genes()
+    tmp<-background()
     
     req(input$registeredmail)
     
