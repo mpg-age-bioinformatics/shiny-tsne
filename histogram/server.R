@@ -43,8 +43,9 @@ shinyServer(function(input, output, session) {
     D[D == ''] <- NA
 
     plot.data.tmp <- D[[input$column]]
-    class(plot.data.tmp)
-    lapply(plot.data.tmp, function(x) x[!is.na(x)])
+    #class(plot.data.tmp)
+    #lapply(plot.data.tmp, function(x) x[!is.na(x)])
+    plot.data.tmp<-plot.data.tmp[!is.na(plot.data.tmp)]
     plot.data.tmp<-as.numeric(plot.data.tmp)
     return(plot.data.tmp)
   })
