@@ -62,6 +62,7 @@ shinyUI( fluidPage(
                                                                                 'semicolon-separated' = ';'), inline = TRUE),
       checkboxInput("header", "Header", TRUE),
       a(href = "https://raw.githubusercontent.com/mpg-age-bioinformatics/shiny/master/histogram/chol.txt", "Example input"),
+      br(),br(),
       textInput("outfile", "Output file name", value="DAVIDws")
       ),
     column(4,
