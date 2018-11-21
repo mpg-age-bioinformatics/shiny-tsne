@@ -10,7 +10,7 @@
 library(shiny)
 
 # Define UI for application that draws a histogram
-shinyUI( fluidPage(
+shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       fileInput("file1", "Choose File",
@@ -50,7 +50,6 @@ shinyUI( fluidPage(
       submitButton('generate plot')
     ),
     mainPanel(
-      #textOutput("testtext"),
       plotOutput("venn", height = "500px", width = "500px"),
       downloadButton('downloadPlot', 'Download Plot'),
       tableOutput("overlap"),

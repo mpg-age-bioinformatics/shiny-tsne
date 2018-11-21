@@ -5,7 +5,7 @@ setwd("~/Documents/corefacility/shiny_apps/shiny/LifeSpanCurves")
 library(survival)
 library(xlsx)
 
-D <- read.xlsx('lifespan_test.xlsx', sheetIndex = 1, header = T)
+D <- read.csv('lifespan_test.csv', header = T)
 head(D)
 
 death = 4
@@ -39,5 +39,5 @@ for(i in 1:nrow(D)){
 
 fit <- survfit(Surv(day, status) ~ genotypes + food, data = D.survival)
 plot(fit, col = rep(1:num_var, times = num_var), lty = rep(1:num_var, each = num_var), lwd = 1.5)
-legend('topright', )
-print(coxph(Surv(day,status)~genotypes*food,data=D.survival,method="breslow"))
+cox <- coxph(Surv(day,status)~ genotypes + food,data=D.survival,method="breslow")
+

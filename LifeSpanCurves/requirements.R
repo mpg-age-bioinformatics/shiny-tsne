@@ -17,5 +17,10 @@ if(!require(survival)){
   library(survival)
 }
 
+if(!require(tidyverse)){
+  install.packages("tidyverse", dependencies = TRUE)
+  library(tidyverse)
+}
+
 
 

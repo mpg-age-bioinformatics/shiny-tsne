@@ -14,10 +14,12 @@ gitversion <- function(){
   git<-substr(git, 1, 7)
   return(git)
 }
+
 library(shiny)
 library(VennDiagram)
 library(xlsx)
 futile.logger::flog.threshold(futile.logger::ERROR, name = "VennDiagramLogger")
+
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
   
@@ -141,6 +143,5 @@ shinyServer(function(input, output) {
   
   output$appversion <- renderText ({ 
     paste0('App version: <b>',gitversion(),'</b>')
-  }
-  )
+  })
 })
