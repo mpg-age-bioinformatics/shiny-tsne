@@ -45,7 +45,9 @@ disease<-c( NULL, 'GENETIC_ASSOCIATION_DB_DISEASE', 'OMIM_DISEASE')
 
 # Define UI for application that draws a histogram
 shinyUI( fluidPage(
+  br(),
   titlePanel("DAVID web services"),
+  br(),
   fluidRow(
     column(4,
       fileInput("file1", "Choose File",
@@ -68,43 +70,43 @@ shinyUI( fluidPage(
     column(4,
       selectInput("genes_list", "Select Target Genes Column", choices = NULL),
       selectInput("genes_list_id", "Target Genes ID type", choices = ltypes),
-      selectInput("background_list", "Select Background Genes Column", choices = NULL),
-      selectInput("background_list_id", "Background Genes ID type", choices = ltypes),
+      selectInput("background_list", "Select Background Genes Column (optional)", choices = NULL),
+      selectInput("background_list_id", "Background Genes ID type (optional)", choices = c("none",ltypes)) ,
       hr(),
-      textInput("registeredmail", "Registered email", value=NULL),
+      textInput("registeredmail", "Registered email", value="jorge.boucas@age.mpg.de"),
       helpText("Please make sure you've registered your email ", a(href = "https://david.ncifcrf.gov/webservice/register.htm", "here" ),"." )
       ),
     column(4,
-      selectInput("gene_ontology_in", "Gene ontology", choices = gene_ontology),
-      selectInput("protein_domains_in", "Protein domains", choices = protein_domains),
-      selectInput("pathways_in", "Pathways", choices = pathways),
-      selectInput("general_annotations_in", "General annotations", choices = general_annotations),
-      selectInput("functional_categories_in", "Functional categories", choices = functional_categories),
-      selectInput("protein_protein_interactions_in", "Protein-protein interactions", choices = protein_protein_interactions),
-      selectInput("literature_in", "Literature", choices = literature),
-      selectInput("disease_in", "Disease", choices = disease)
+      selectInput("gene_ontology_in", "Gene ontology", choices = c('none',gene_ontology), multiple = TRUE, selected='GOTERM_BP_FAT'),
+      selectInput("protein_domains_in", "Protein domains", choices = c('none',protein_domains), multiple = TRUE, selected='none'),
+      selectInput("pathways_in", "Pathways", choices = c('none',pathways), multiple = TRUE, selected='none'),
+      selectInput("general_annotations_in", "General annotations", choices = c('none',general_annotations), multiple = TRUE, selected='none'),
+      selectInput("functional_categories_in", "Functional categories", choices = c('none',functional_categories), multiple = TRUE, selected='none'),
+      selectInput("protein_protein_interactions_in", "Protein-protein interactions", choices = c('none',protein_protein_interactions), multiple = TRUE, selected='none'),
+      selectInput("literature_in", "Literature", choices = c('none',literature), multiple = TRUE, selected='none'),
+      selectInput("disease_in", "Disease", choices = c('none',disease), multiple = TRUE, selected='none')
       ),
     column(4,
       submitButton('Submit')   
     )
     ),
     mainPanel(
-      br(), br(),
-      column(4,
-      #textOutput("testtext"),
-      #plotOutput("histogram", height = "500px", width = "500px"),
-      downloadButton('downloadTable', 'Download results')),
-      br(), br(),br(), br(),
+      br(),
+      htmlOutput('mapped'),
+      br(),
+      downloadButton('downloadTable', 'Cluster Report')),
+      br(), br(),br(),br(), br(),br(),br(),br(),br(),
+      downloadButton('FunctionalAnnotation', 'Functional Annotation'),
+      br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),
       p("This App uses the", code('RDAVIDWebService'), " package. For more information read the respective documentation in ",
         a("cran", href = "http://bioconductor.org/packages/release/bioc/html/RDAVIDWebService.html"),
-        "and vist ", a("DAVID Web Services page",href="https://david.ncifcrf.gov/content.jsp?file=WS.html"),".",
+        "and visit ", a("DAVID Web Services page",href="https://david.ncifcrf.gov/content.jsp?file=WS.html"),".",
         "Please cite 'Fresno C, Fernández EA (2013). ",
         "RDAVIDWebService: a versatile R interface to DAVID. Bioinformatics, 29(21), 2810–2811.'",
         "."
         ),
       p("Please keep the version tag on all downloaded files."),
       htmlOutput('appversion')
-    )
   )
 )
 
