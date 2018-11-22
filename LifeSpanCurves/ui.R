@@ -74,6 +74,7 @@ shinyUI(fluidPage(
       radioButtons('logaxis', 'Use log-scale', choices = c('none' ='', 'x-axis' = 'x', 'y-axis' = 'y', 'both' = 'xy'), inline = TRUE),
       radioButtons('conf', 'Plot confidence interval', choices = c("no" = FALSE, "yes" = TRUE), inline = TRUE),
       radioButtons('marks', 'Mark censored events', choices = c("no" = FALSE, "yes" = TRUE), inline = TRUE),
+      radioButtons('interaction_term', 'Add interaction term', choices = c("no" = FALSE, "yes" = TRUE), inline = TRUE),
       
       hr(),
       checkboxInput('table', "Show table", FALSE),
@@ -85,8 +86,13 @@ shinyUI(fluidPage(
     # Main panel for displaying outputs ----
     mainPanel(
       plotOutput("survPlot"),
+      hr(),
+      verbatimTextOutput("survStats"),
       downloadButton('downloadPlot', 'Download Plot'),
+      downloadButton('downloadReport', 'Generate Report'),
+      hr(),
       tableOutput("survTab"),
+      downloadButton('downloadTable', 'Download Table'),
       br(),br(),
       p("This App uses the", code('survival'), " package. For more information read the respective documentation in ",
         a("cran", href = "https://cran.r-project.org/web/packages/survival/index.html"),

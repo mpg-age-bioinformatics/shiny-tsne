@@ -178,18 +178,22 @@ shinyServer(function(input, output, session) {
       rename_variables <- paste('group', 1:num_var, sep = '_')
       plot.data = df_sel()
       names(plot.data) = c('day', 'status', rename_variables)
+      
       # make different models
       if(num_var == 1){
-        fit <- survfit(Surv(day, status) ~ group_1, data = plot.data)
+           cox <- coxph(Surv(day,status) ~ ., data= plot.data, method="breslow")
       } else if(num_var == 2){
-        fit <- survfit(Surv(day, status) ~ group_1 + group_2, data = plot.data)
+        if(as.logical(input$interaction_term)){
+          cox <- coxph(Surv(day,status) ~ . + group_1 * group_2, data= plot.data, method="breslow")
+        } else {
+          cox <- coxph(Surv(day,status) ~ ., data= plot.data, method="breslow")
+        }
       } else if (num_var >= 3){
         print(paste("You have selected", num_var, "variables\nPlease select only 2 or less"))
         return(NULL)
       }
     }
     
-    coxph(Surv(day,status)~genotypes*food,data=D.survival,method="breslow")
   })
   
   output$survPlot <- renderPlot({
@@ -230,37 +234,109 @@ shinyServer(function(input, output, session) {
   })
 
   # print cox proportional hazard model
-  
+  output$survStats <- renderPrint({
+    print(summary(cox()))
+ })
+    
+    
+    
+    
   output$downloadPlot <- downloadHandler(
     
     # specify file name
-    filename = function(){
-      paste0(input$outfile,".",gitversion(),'.pdf')
-    },
+    filename = 'test.pdf',
+    # filename = function() {
+    #   paste(input$outfile,".long.",gitversion(),".csv", sep = "")
+    # },
     content = function(filename){
       # open device
       pdf(filename)
       
       # create plot # copy from outside
       # copy code from above
+      
+      # setting the plot titles and styles
+      # change here settings here
+      main = input$main
+      xlab = input$xlab
+      ylab = input$ylab
+      lwd = input$linewidth
+      cex.axis = input$axis.size
+      cex.lab = input$lab.size
+      cex.main = input$main.size
+      cex.legend = input$legend.size
+      confidence_interval = as.logical(input$conf)
+      mark.time = as.logical(input$marks)
+      log = input$logaxis
+      colors = plot.color()
+      linetype = plot.line()
+      par(mar = rep(input$margin.size, 4))
+      
+      plot(surv.data(), conf.int = confidence_interval, col = colors$color, lty = linetype$lty, lwd = lwd, mark.time = mark.time,
+           xlab = xlab, ylab = ylab, main = main, log = log,
+           cex.axis = cex.axis, cex.lab= cex.lab, cex.main = cex.main)
+      if(length(colors$color.legend) > 1){
+        legend('topright', legend = colors$category, col = colors$color.legend, cex = cex.legend, title = colors$legend_name, lty = 1, bty = 'n')
+      }
+      if(length(linetype$linetype.legend) > 1){
+        legend('bottomleft', legend = linetype$category, lty = linetype$linetype.legend, cex = cex.legend, title = linetype$legend_name, col = colors$color.legend[1], bty = 'n')
+      }
       # close device
       dev.off()
-    }
-  )
+    })
+  
   output$downloadTable <- downloadHandler(
-    filename = function() {
-      paste(input$outfile,".long.",gitversion(),".csv", sep = "")
-    },
-    content = function(file) {
+    filename = 'test.csv',
+    # filename = function() {
+    #   paste(input$outfile,".long.",gitversion(),".csv", sep = "")
+    # },
+    content = function(filename) {
       inFile <- input$uploaded_file
       
       if (is.null(inFile))
         return(NULL)
       if (input$table){
-        write.csv(df_sel(), file, row.names = FALSE, quote = FALSE, sep = '\t')
+        write.csv(df_sel(), filename, row.names = FALSE, quote = FALSE, sep = '\t')
       }
     }
   )
+  
+  
+  output$downloadReport <- downloadHandler(
+    # For PDF output, change this to "report.pdf"
+    filename = 'report.pdf',
+    # filename = function() {
+    #   paste(input$outfile,".report.",gitversion(),".pdf", sep = "")
+    # },
+    content = function(file) {
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir (which
+      # can happen when deployed).
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      file.copy("report.Rmd", tempReport, overwrite = TRUE)
+      
+      # Set up parameters to pass to Rmd document
+      params <- list( surv.data = surv.data(), cox = cox(), main = input$main, 
+                      xlab = input$xlab, ylab = input$ylab, lwd = input$linewidth,
+                      cex.axis = input$axis.size, cex.lab = input$lab.size,
+                      cex.main = input$main.size, cex.legend = input$legend.size,
+                      confidence_interval = as.logical(input$conf),
+                      mark.time = as.logical(input$marks), log = input$logaxis,
+                      colors = plot.color(), linetype = plot.line(),
+                      margin.size = input$margin.size
+      )
+      
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+    }
+  )
+  
+  
   
   # print app version
   output$appversion <- renderText ({ 
