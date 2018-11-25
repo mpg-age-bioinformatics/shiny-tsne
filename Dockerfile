@@ -44,3 +44,6 @@ RUN apt-get install -yq libxml2-dev && \
     keytool -import -trustcacerts -keystore cacerts -storepass changeit -noprompt -alias david -file ncifcrf.cert && \
     cp cacerts /etc/ssl/certs/java/ && \
     R CMD javareconf
+
+# required for cellplot / devtools
+RUN apt-get install libssl-dev

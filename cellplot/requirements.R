@@ -1,7 +1,6 @@
 .libPaths("/srv/shiny-server/cellplot/libs")
 library(shiny)
 # apt-get install libssl-dev
-install.packages("httr", dependencies = TRUE)
 
 if(!require(devtools)){
   install.packages("devtools", dependencies = TRUE)
@@ -21,6 +20,15 @@ if(!require(futile.logger)){
 
 
 quit(save="no")
+
+
+#################################################
+#												#
+#												#
+#                   DEV AREA					#
+#												#
+#												#
+#################################################
 
 
 library(CellPlot)
