@@ -132,7 +132,7 @@ cell.plot(x = setNames(x$LogEnrich, x$Term),
 
 sym.plot(x = setNames(x$LogEnrich, x$Term), 
          cells = x$log2FoldChange, 
-         x.annotated = x$Annotated, 
+         x.annotated = x$Count, 
          main = "GO enrichment",
          x.mar = c(.47, 0), 
          key.n = 7, 

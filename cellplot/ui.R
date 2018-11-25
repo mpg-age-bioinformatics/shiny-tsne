@@ -41,7 +41,7 @@ shinyUI( fluidPage(
       selectInput("genessel","Select Genes Name/ID Column",  choices = NULL, selected = NULL),
       selectInput("logfcsel","Select Log2(FC) Column", choices = NULL, selected = NULL),
       selectInput("padjsel","Select P Adj. Column", choices = NULL, selected = NULL),
-      sliderInput('nterms',  "Number of terms to plot", min = 1, max = 20, value = 10, step = 1),
+      sliderInput('nterms',  "Number of terms to plot", min = 1, max = 40, value = 40, step = 1),
       hr(),
       textInput("outfile", "Output file name", value="cellplots"),
       submitButton('submit')
@@ -50,21 +50,24 @@ shinyUI( fluidPage(
       tabsetPanel(
         tabPanel(
           "cellplot",
-          plotOutput("cellplot", height = "1000px", width = "1000px")
+          plotOutput("cellplot", height = "850px", width = "900px"),
+          downloadButton('downloadcellPlot', 'Download Plot')
           ),
         tabPanel(
           "symplot",
-          plotOutput("symplot", height = "1000px", width = "1000px")
+          plotOutput("symplot", height = "1000px", width = "1000px"),
+          downloadButton('downloadsymPlot', 'Download Plot')
         ),
         tabPanel(
           "arcplot",
-          plotOutput("arcplot", height = "1000px", width = "1000px")
-        ),
-        tabPanel(
-          "histogram",
-          plotOutput("histogram", height = "1000px", width = "1000px")
-        )
-        ),
+          plotOutput("arcplot", height = "850px", width = "900px"),
+          downloadButton('downloadarcPlot', 'Download Plot')
+        )),
+        #tabPanel(
+        #  "histogram",
+        #  plotOutput("histogram", height = "1000px", width = "1000px")
+        #)
+        #),
       br(), br(),
       p("This App uses the", code('cellplot'), " package. For more information read the respective documentation in ",
         a("github", href = "http://htmlpreview.github.io/?https://github.com/dieterich-lab/CellPlot/blob/master/vignettes/CellPlotManual.html"),
