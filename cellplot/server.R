@@ -13,36 +13,6 @@ futile.logger::flog.threshold(futile.logger::ERROR, name = "cellplotLogger")
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
   
-  #ref.data <- reactive({
-  #  inFileExp <- input$file2
-  #  filetype2 <- input$filetype2
-  #  #req(inFileExp)
-  #  
-  #  filetype_map <- c("xlsx" = 'xlsx',  'tsv' = '\t', 'csv' = ',', 'txt'=" ")
-  #  if(filetype2 == 'auto'){
-  #    file_extension =  unlist(strsplit(inFileExp$datapath, '[.]'))[length(unlist(strsplit(inFileExp$datapath, '[.]')))]
-  #    if(file_extension %in% names(filetype_map)){
-  #      filetype2 <- filetype_map[file_extension]
-  #      names(filetype2) <- NULL
-  #      
-  #    } else {
-  #      print(paste("wrong file format", file_extension))
-  #      return(NULL)
-  #    }
-  #  }
-  #  
-  #  if(filetype2 == 'xlsx'){
-  #    DD <- read.xlsx(inFileExp$datapath, sheetIndex = 1, header = input$header2)
-  #  } else {
-  #    DD <- read.csv(inFileExp$datapath, header = input$header2, sep = filetype2)
-  #  }
-  #  
-  #  DD[DD == ''] <- NA
-  #
-  #  return(DD)
-  #})
-  
-  
   # reformat input data
   plot.data <- reactive({
     inFile <- input$file1
@@ -69,27 +39,11 @@ shinyServer(function(input, output, session) {
       D <- read.csv(inFile$datapath, header = input$header, sep = filetype)
     }
     
-    ##### relabel headers from DAVID into cellplot standards
-    # 
-    # 
-    D["GenesSignificant"]<-D$Genes
-    
-    genes<-D$GenesSignificant
-    class(genes)
-    genes<-lapply( genes, function(x) strsplit(toString(x), ", ")[[1]])
-    D$GenesSignificant<-genes
     Categories<-unique(D$Category)
-
-    
-    #
-    #
-    
-    #req(input$file2)
     
     inFileExp <- input$file2
     filetype2 <- input$filetype2
-    #req(inFileExp)
-    
+
     filetype_map <- c("xlsx" = 'xlsx',  'tsv' = '\t', 'csv' = ',', 'txt'=" ")
     if(filetype2 == 'auto'){
       file_extension =  unlist(strsplit(inFileExp$datapath, '[.]'))[length(unlist(strsplit(inFileExp$datapath, '[.]')))]
@@ -110,63 +64,37 @@ shinyServer(function(input, output, session) {
     }
     
     DD[DD == ''] <- NA
-    
-    
-    
-    #DD<-ref.data()
-    varsgenes <- names(DD)
-    varslogfc <- names(DD)
-    varspadj <- names(DD)
-    
-    cat(file=stderr(), "here1", "\n")
-    
-    #observe({
-    #  if(!is.null(input$file2))
-    #    updateSelectInput(session,  "genessel","Select Genes Name/ID Column", choices = varsgenes)})
-    
+
+    vars <- names(DD)
     updateSelectInput(session, "categories","Select Categories", choices = Categories)
-    updateSelectInput(session, "genessel","Select Genes Name/ID Column", choices = varsgenes )
-    updateSelectInput(session, "logfcsel","Select Log2(FC) Column", choices = varslogfc)
-    updateSelectInput(session, "padjsel","Select P Adj. Column", choices = varspadj)
+    updateSelectInput(session, "genessel","Select Genes Name/ID Column", choices = vars )
+    updateSelectInput(session, "logfcsel","Select Log2(FC) Column", choices = vars)
+    updateSelectInput(session, "padjsel","Select P Adj. Column", choices = vars)
     
     req(input$categories)
     req(input$genessel)
     req(input$logfcsel)
     req(input$padjsel)
     
-    cat(file=stderr(), input$categories, "\n")
-    cat(file=stderr(), "genes", "\n")
-    cat(file=stderr(), input$genessel, "\n")
-    cat(file=stderr(), "log2fc", "\n")
-    cat(file=stderr(), input$logfcsel, "\n")
-    cat(file=stderr(), "padj", "\n")
-    cat(file=stderr(), input$padjsel, "\n")
-    cat(file=stderr(), "here3", "\n")
-    
-    refcol<-input$genessel
-    DD$GenesSignificantb<-DD$GenesSignificant
-    DD['GenesSignificant']<-DD$refcol
-    dput(DD,file="/srv/shiny-server/cellplot/test.ref.R")
-    
-    #cat(file=stderr(), unlist(genes), "\n")
-    
-    
-    #fcs<-
-    #cat(file=stderr(), unlist(fcs), "\n")
-    cat(file=stderr(), "here4", "\n")
-    #cat(file=stderr(), unlist(head(D)), "\n")
-    #cat(file=stderr(), unlist(head(DD)), "\n")
-    
-    
-    D$log2FoldChange<-lapply( genes, function(x) DD[DD$GenesSignificant %in% x, 'log2FoldChange' ])
-    D$padj<- lapply( genes, function(x) DD[DD$GenesSignificant %in% x, 'padj' ])
-    
-    D$LogEnrich<-D$Fold.Enrichment
+    #refcol<-input$genessel
+    siggenes<-DD[input$genessel]
+    DD['GenesSignificant']<-siggenes
+    dput(DD,"/srv/shiny-server/cellplot/test.ref.R")
     
     D<-D[D["Category"] == input$categories, ]
-    
     D <- D[order(D$PValue),]
     D <- D[1:input$nterms,]
+    
+    D["GenesSignificant"]<-D$Genes
+    genes<-D$GenesSignificant
+    class(genes)
+    genes<-lapply( genes, function(x) strsplit(toString(x), ", ")[[1]])
+    D$GenesSignificant<-genes
+    
+    D$log2FoldChange<-lapply( genes, function(x) DD[DD$GenesSignificant %in% x, input$logfcsel ])
+    D$padj<- lapply( genes, function(x) DD[DD$GenesSignificant %in% x, input$padjsel ])
+    
+    D$LogEnrich<-D$Fold.Enrichment
     
     return(D)
   })
@@ -174,7 +102,6 @@ shinyServer(function(input, output, session) {
   plot.cellplot<-reactive({
   
     x<-plot.data()
-    dput(x,file="/srv/shiny-server/cellplot/test.object.R")
     cell.plot(x = setNames(x$LogEnrich, x$Term), 
               cells = x$log2FoldChange, 
               main ="GO enrichment", 

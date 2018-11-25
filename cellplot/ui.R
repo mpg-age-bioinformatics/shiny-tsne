@@ -2,6 +2,9 @@
 library(shiny)
 # Define UI for application that draws a histogram
 shinyUI( fluidPage(
+  tags$head(
+    tags$style(HTML("hr {border-top: 2px solid #000000;}"))
+  ),
   sidebarLayout(
     sidebarPanel(
       fileInput("file1", "DAVID's Functional Annotation file",
@@ -44,7 +47,24 @@ shinyUI( fluidPage(
       submitButton('submit')
     ),
     mainPanel(
-      plotOutput("cellplot", height = "500px", width = "500px"),
+      tabsetPanel(
+        tabPanel(
+          "cellplot",
+          plotOutput("cellplot", height = "1000px", width = "1000px")
+          ),
+        tabPanel(
+          "symplot",
+          plotOutput("symplot", height = "1000px", width = "1000px")
+        ),
+        tabPanel(
+          "arcplot",
+          plotOutput("arcplot", height = "1000px", width = "1000px")
+        ),
+        tabPanel(
+          "histogram",
+          plotOutput("histogram", height = "1000px", width = "1000px")
+        )
+        ),
       br(), br(),
       p("This App uses the", code('cellplot'), " package. For more information read the respective documentation in ",
         a("github", href = "http://htmlpreview.github.io/?https://github.com/dieterich-lab/CellPlot/blob/master/vignettes/CellPlotManual.html"),
