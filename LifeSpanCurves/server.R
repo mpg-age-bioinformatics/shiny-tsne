@@ -7,8 +7,17 @@
 #    http://shiny.rstudio.com/
 #
 
+# .libPaths("/srv/shiny-server/LifeSpanCurves/libs")
+# gitversion <- function(){ 
+#   git<-read.csv("/srv/shiny-server/.git/refs/heads/master", header=FALSE)
+#   git<-git$V1
+#   git<-toString(git[1])
+#   git<-substr(git, 1, 7)
+#   return(git)
+# }
+# 
+
 library(shiny)
-#library(DT)
 library(tidyverse)
 library(survival)
 library(xlsx)
@@ -51,8 +60,9 @@ shinyServer(function(input, output, session) {
   })
   
   
-  
   # Select columns and reformat table for survival analysis ----
+  # checkbox if already correctly formatted table
+  
   df_sel <- reactive({
     req(input$day, input$death, input$censor)
     df_sel <- df() %>% select(input$day, input$death, input$censor, input$factors)
@@ -84,44 +94,253 @@ shinyServer(function(input, output, session) {
         }
     }
     D.survival
-    
   })
   
-  output$survPlot <- renderPlot({
+  plot.color <- reactive({
+    colors<- input$colors
+    color.legend <- gsub(' ', '', colors)
+    color.legend <- unlist(strsplit(color.legend, ','))
+    df_sel <- df() %>% select(input$factors)
+    
+    if(length(input$factors) > 0){
+      categories = levels(df_sel[,1])
+    } else {
+      categories = '1'
+    }
+    
+    if(length(categories) < length(color.legend)){
+      color.legend <- color.legend[1:length(categories)]
+    }
+    if(length(input$factors) == 2){
+      color.tmp = rep(color.legend, each = length(levels(df_sel[,2])))
+    } else {
+      color.tmp = color.legend
+    }
+    colors <- list(color = color.tmp, category = categories, legend_name = names(df_sel)[1], color.legend = color.legend)
+  })
+  
+  plot.line <- reactive({
+    linetype.legend <- as.numeric(input$linetype)
+    df_sel <- df() %>% select(input$factors)
+    print(linetype.legend)
+    if(length(input$factors) > 1){
+      categories = levels(df_sel[,2])
+      legend_name = names(df_sel)[2]
+    } else if (length(input$factors) == 1){
+      categories = levels(df_sel[,1])
+      legend_name = names(df_sel)[1]
+    } else {
+      categories = '1'
+      legend_name = ''
+    }
+    
+    if(length(categories) < length(linetype.legend)){
+      linetype.legend <- linetype.legend[1:length(categories)]
+    }
+    if(length(input$factors) == 2){
+      linetype.tmp = rep(linetype.legend, times = length(levels(df_sel[,1])))
+    } else {
+      linetype.tmp = linetype.legend
+    }
+    linetypes <- list(lty = linetype.tmp, category = categories, legend_name = legend_name, linetype.legend = linetype.legend)
+  })
+  
+  surv.data <- reactive({
     num_var = length(input$factors)
+
+    # plot
     if(num_var == 0){
       fit <- survfit(Surv(day, status) ~ 1, data = df_sel())
-      plot(fit, col = 'black', lty = 1, lwd = 1.5, conf.int = TRUE, main = 'Survival', xlab = 'days')
     } else {
       rename_variables <- paste('group', 1:num_var, sep = '_')
       plot.data = df_sel()
       names(plot.data) = c('day', 'status', rename_variables)
+      # make different models
       if(num_var == 1){
         fit <- survfit(Surv(day, status) ~ group_1, data = plot.data)
-        plot(fit, col = 1, lty = c(1,2), lwd = 1.5)
-        
       } else if(num_var == 2){
         fit <- survfit(Surv(day, status) ~ group_1 + group_2, data = plot.data)
-        plot(fit, col = rep(1:num_var, times = num_var), lty = rep(1:num_var, each = num_var), lwd = 1.5)
-        
-      } else if (num_var == 3){
-        fit <- survfit(Surv(day, status) ~ group_1 + group_2 + group_3, data = plot.data)
-        plot(fit, col = rep(1:num_var, times = num_var), lty = rep(1:num_var, each = num_var), lwd = 1.5)
-      } else if (num_var > 3){
-        print(paste("You have selected", num_var, "variables\nPlease select only three or less"))
+      } else if (num_var >= 3){
+        print(paste("You have selected", num_var, "variables\nPlease select only 2 or less"))
         return(NULL)
       }
+    }
+    fit
+  })
+  
+  cox <- reactive({
+    num_var = length(input$factors)
+    
+    # plot
+    if(num_var == 0){
+      fit <- survfit(Surv(day, status) ~ 1, data = df_sel())
+    } else {
+      rename_variables <- paste('group', 1:num_var, sep = '_')
+      plot.data = df_sel()
+      names(plot.data) = c('day', 'status', rename_variables)
+      
+      # make different models
+      if(num_var == 1){
+           cox <- coxph(Surv(day,status) ~ ., data= plot.data, method="breslow")
+      } else if(num_var == 2){
+        if(as.logical(input$interaction_term)){
+          cox <- coxph(Surv(day,status) ~ . + group_1 * group_2, data= plot.data, method="breslow")
+        } else {
+          cox <- coxph(Surv(day,status) ~ ., data= plot.data, method="breslow")
+        }
+      } else if (num_var >= 3){
+        print(paste("You have selected", num_var, "variables\nPlease select only 2 or less"))
+        return(NULL)
+      }
+    }
+    
+  })
+  
+  output$survPlot <- renderPlot({
+
+    # setting the plot titles and styles
+    # change here settings here
+    main = input$main
+    xlab = input$xlab
+    ylab = input$ylab
+    lwd = input$linewidth
+    cex.axis = input$axis.size
+    cex.lab = input$lab.size
+    cex.main = input$main.size
+    cex.legend = input$legend.size
+    confidence_interval = as.logical(input$conf)
+    mark.time = as.logical(input$marks)
+    log = input$logaxis
+    colors = plot.color()
+    linetype = plot.line()
+    par(mar = rep(input$margin.size, 4))
+
+    plot(surv.data(), conf.int = confidence_interval, col = colors$color, lty = linetype$lty, lwd = lwd, mark.time = mark.time,
+        xlab = xlab, ylab = ylab, main = main, log = log,
+        cex.axis = cex.axis, cex.lab= cex.lab, cex.main = cex.main)
+    if(length(colors$color.legend) > 1){
+      legend('topright', legend = colors$category, col = colors$color.legend, cex = cex.legend, title = colors$legend_name, lty = 1, bty = 'n')
+    }
+    if(length(linetype$linetype.legend) > 1){
+      legend('bottomleft', legend = linetype$category, lty = linetype$linetype.legend, cex = cex.legend, title = linetype$legend_name, col = colors$color.legend[1], bty = 'n')
     }
   })
 
   # Print data table ----  
-  output$rendered_file <- renderTable({
-    if(input$disp == "head") {
-      head(df_sel())
+  output$survTab <- renderTable({
+    if (input$table){
+        head(df_sel())
     }
-    else {
-      df_sel()
+  })
+
+  # print cox proportional hazard model
+  output$survStats <- renderPrint({
+    print(summary(cox()))
+ })
+    
+    
+    
+    
+  output$downloadPlot <- downloadHandler(
+    
+    # specify file name
+    filename = 'test.pdf',
+    # filename = function() {
+    #   paste(input$outfile,".long.",gitversion(),".csv", sep = "")
+    # },
+    content = function(filename){
+      # open device
+      pdf(filename)
+      
+      # create plot # copy from outside
+      # copy code from above
+      
+      # setting the plot titles and styles
+      # change here settings here
+      main = input$main
+      xlab = input$xlab
+      ylab = input$ylab
+      lwd = input$linewidth
+      cex.axis = input$axis.size
+      cex.lab = input$lab.size
+      cex.main = input$main.size
+      cex.legend = input$legend.size
+      confidence_interval = as.logical(input$conf)
+      mark.time = as.logical(input$marks)
+      log = input$logaxis
+      colors = plot.color()
+      linetype = plot.line()
+      par(mar = rep(input$margin.size, 4))
+      
+      plot(surv.data(), conf.int = confidence_interval, col = colors$color, lty = linetype$lty, lwd = lwd, mark.time = mark.time,
+           xlab = xlab, ylab = ylab, main = main, log = log,
+           cex.axis = cex.axis, cex.lab= cex.lab, cex.main = cex.main)
+      if(length(colors$color.legend) > 1){
+        legend('topright', legend = colors$category, col = colors$color.legend, cex = cex.legend, title = colors$legend_name, lty = 1, bty = 'n')
+      }
+      if(length(linetype$linetype.legend) > 1){
+        legend('bottomleft', legend = linetype$category, lty = linetype$linetype.legend, cex = cex.legend, title = linetype$legend_name, col = colors$color.legend[1], bty = 'n')
+      }
+      # close device
+      dev.off()
+    })
+  
+  output$downloadTable <- downloadHandler(
+    filename = 'test.csv',
+    # filename = function() {
+    #   paste(input$outfile,".long.",gitversion(),".csv", sep = "")
+    # },
+    content = function(filename) {
+      inFile <- input$uploaded_file
+      
+      if (is.null(inFile))
+        return(NULL)
+      if (input$table){
+        write.csv(df_sel(), filename, row.names = FALSE, quote = FALSE, sep = '\t')
+      }
     }
+  )
+  
+  
+  output$downloadReport <- downloadHandler(
+    # For PDF output, change this to "report.pdf"
+    filename = 'report.pdf',
+    # filename = function() {
+    #   paste(input$outfile,".report.",gitversion(),".pdf", sep = "")
+    # },
+    content = function(file) {
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir (which
+      # can happen when deployed).
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      file.copy("report.Rmd", tempReport, overwrite = TRUE)
+      
+      # Set up parameters to pass to Rmd document
+      params <- list( surv.data = surv.data(), cox = cox(), main = input$main, 
+                      xlab = input$xlab, ylab = input$ylab, lwd = input$linewidth,
+                      cex.axis = input$axis.size, cex.lab = input$lab.size,
+                      cex.main = input$main.size, cex.legend = input$legend.size,
+                      confidence_interval = as.logical(input$conf),
+                      mark.time = as.logical(input$marks), log = input$logaxis,
+                      colors = plot.color(), linetype = plot.line(),
+                      margin.size = input$margin.size
+      )
+      
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+    }
+  )
+  
+  
+  
+  # print app version
+  output$appversion <- renderText ({ 
+    paste0('App version: <b>',gitversion(),'</b>')
   })
   
 })
