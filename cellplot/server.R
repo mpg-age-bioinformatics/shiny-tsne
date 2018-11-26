@@ -79,7 +79,7 @@ shinyServer(function(input, output, session) {
     #refcol<-input$genessel
     siggenes<-DD[input$genessel]
     DD['GenesSignificant']<-siggenes
-    dput(DD,"/srv/shiny-server/cellplot/test.ref.R")
+    #dput(DD,"/srv/shiny-server/cellplot/test.ref.R")
     
     D<-D[D["Category"] == input$categories, ]
     D <- D[order(D$PValue),]
