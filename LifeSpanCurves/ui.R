@@ -29,22 +29,24 @@ shinyUI(fluidPage(
         tabPanel("Input and model settings",
                  # Input: Select a file ----
                  hr(),
-                 fileInput("uploaded_file", "Choose CSV File",
-                           multiple = TRUE,
+                 fileInput("uploaded_file", "Choose File",
                            accept = c("text/csv",
                                       "text/comma-separated-values,text/plain",
-                                      ".csv")),
+                                      ".tsv",
+                                      ".csv",
+                                      ".xlsx")
+                 ),
+                 # Input: Select separator ----
+                 radioButtons("filetype", 'Please select the input file type', choices = c('auto' = 'auto', 
+                                                                                           "excel" = 'xlsx',  
+                                                                                           'tab-separated' = '\t', 
+                                                                                           'comma-seperated' = ',', 
+                                                                                           'semicolon-separated' = ';'), inline = TRUE),
+                 checkboxInput('longtable', "Table in long format", FALSE),
                  
                  # Input: Checkbox if file has header ----
                  a(href = "https://github.com/mpg-age-bioinformatics/shiny/blob/master/LifeSpanCurves/lifespan_test.csv", "Example input"),
                  checkboxInput("header", "Header", TRUE),
-                 
-                 # Input: Select separator ----
-                 radioButtons("sep", "Separator",
-                              choices = c(Semicolon = ";",
-                                          Comma = ",",
-                                          Tab = "\t"),
-                              selected = ",", inline = TRUE),
                  
                  
                  # Horizontal line ----
@@ -82,10 +84,13 @@ shinyUI(fluidPage(
                  sliderInput('axis.size', 'Select font size for the axis', min = 0, max = 5, value = 1.2, step = 0.1),
                  sliderInput('legend.size', 'Select font size for the legend', min = 0, max = 5, value = 1.3, step = 0.1),
                  sliderInput('linewidth', 'Select line width', min = 0, max = 5, value = 1, step = 0.1),
-                 sliderInput('margin.size', 'Select margin size', min = 1, max = 10, value = 4, step = 0.1),
+                 sliderInput('boxwidth', 'Select box line width', min = 0, max = 5, value = 1, step = 0.1),
+                 sliderInput('margin.size', 'Select margin size', min = 1, max = 10, value = 4.5, step = 0.1),
                  radioButtons('logaxis', 'Use log-scale', choices = c('none' ='', 'x-axis' = 'x', 'y-axis' = 'y', 'both' = 'xy'), inline = TRUE),
                  radioButtons('conf', 'Plot confidence interval', choices = c("no" = FALSE, "yes" = TRUE), inline = TRUE),
                  radioButtons('marks', 'Mark censored events', choices = c("no" = FALSE, "yes" = TRUE), inline = TRUE),
+                 sliderInput('plot.height', 'Select plot height (inches)', min = 2, max = 20, value = 7, step = 0.1),
+                 sliderInput('plot.width', 'Select plot width (inches)', min = 2, max = 20, value = 10, step = 0.1),
                  submitButton('run survival analysis')
         )
       )

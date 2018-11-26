@@ -26,12 +26,32 @@ library(xlsx)
 shinyServer(function(input, output, session) {
   
   # Read file ----
+  
   df <- reactive({
     req(input$uploaded_file)
-    read.csv(input$uploaded_file$datapath,
-             header = input$header,
-             sep = input$sep)  
+    inFile <- input$uploaded_file
+    filetype <- input$filetype
     
+    if (is.null(inFile))
+      return(NULL)
+    filetype_map <- c("xlsx" = 'xlsx',  'tsv' = '\t', 'csv' = ',', 'txt'=" ")
+    if(filetype == 'auto'){
+      file_extension =  unlist(strsplit(inFile$datapath, '[.]'))[length(unlist(strsplit(inFile$datapath, '[.]')))]
+      if(file_extension %in% names(filetype_map)){
+        filetype <- filetype_map[file_extension]
+        names(filetype) <- NULL
+        
+      } else {
+        print(paste("wrong file format", file_extension))
+        return(NULL)
+      }
+    }
+    
+    if(filetype == 'xlsx'){
+      read.xlsx(inFile$datapath, sheetIndex = 1, header = input$header)
+    } else {
+      read.csv(inFile$datapath, header = input$header, sep = filetype)
+    }
   })
   
   # Dynamically generate UI input when data is uploaded ----
@@ -43,7 +63,7 @@ shinyServer(function(input, output, session) {
   
   output$deaths <- renderUI({
     selectInput(inputId = "death", 
-                       label = "Select deaths", 
+                       label = "Select deaths/status (long table)", 
                        choices = names(df()))
   })
   
@@ -56,7 +76,7 @@ shinyServer(function(input, output, session) {
   output$factors <- renderUI({
     checkboxGroupInput(inputId = "factors", 
                        label = "Select variables", 
-                       choices = names(df()))
+                       choices = c(NULL, names(df())))
   })
   
   
@@ -64,26 +84,29 @@ shinyServer(function(input, output, session) {
   # checkbox if already correctly formatted table
   
   df_sel <- reactive({
-    req(input$day, input$death, input$censor)
-    df_sel <- df() %>% select(input$day, input$death, input$censor, input$factors)
-    
-    D = df_sel
-    num_var = length(input$factors)
-    D.survival <- as.data.frame(matrix(0, nrow = sum(D[,c(input$death, input$censor)]), ncol = 2 + num_var))
-    names(D.survival) <- c('day', 'status', input$factors) 
-
-    r = 1 # row counter for D.survival
-    for(i in 1:nrow(D)){
-      if(D[i, input$death] > 0){
-        for(event in 1:D[i,input$death]){
-          D.survival[r,c(1,2)] <- c(D[i,input$day], 1)
-          if(num_var > 0){
-            D.survival[r, c(3:ncol(D.survival))] <- as.character(D[i, input$factors])
+    if(input$longtable){
+      req(input$day, input$death)
+      D.survival <- df() %>% select(input$day, input$death, input$factors)
+    } else {
+      df_sel <- df() %>% select(input$day, input$death, input$censor, input$factors)
+      
+      D = df_sel
+      num_var = length(input$factors)
+      D.survival <- as.data.frame(matrix(0, nrow = sum(D[,c(input$death, input$censor)]), ncol = 2 + num_var))
+      names(D.survival) <- c('day', 'status', input$factors) 
+      
+      r = 1 # row counter for D.survival
+      for(i in 1:nrow(D)){
+        if(D[i, input$death] > 0){
+          for(event in 1:D[i,input$death]){
+            D.survival[r,c(1,2)] <- c(D[i,input$day], 1)
+            if(num_var > 0){
+              D.survival[r, c(3:ncol(D.survival))] <- as.character(D[i, input$factors])
             }
-          r = r+1
+            r = r+1
+          }
         }
-      }
-      if(D[i, input$censor] > 0){
+        if(D[i, input$censor] > 0){
           for(event in 1:D[i,input$censor]){
             D.survival[r,c(1,2)] <- c(D[i,input$day], 0)
             if(num_var > 0){
@@ -92,8 +115,9 @@ shinyServer(function(input, output, session) {
             r = r+1
           }
         }
+      }
+      D.survival
     }
-    D.survival
   })
   
   plot.color <- reactive({
@@ -101,6 +125,8 @@ shinyServer(function(input, output, session) {
     color.legend <- gsub(' ', '', colors)
     color.legend <- unlist(strsplit(color.legend, ','))
     df_sel <- df() %>% select(input$factors)
+    
+    df_sel[input$factors] <- lapply(df_sel[input$factors], factor)
     
     if(length(input$factors) > 0){
       categories = levels(df_sel[,1])
@@ -122,7 +148,8 @@ shinyServer(function(input, output, session) {
   plot.line <- reactive({
     linetype.legend <- as.numeric(input$linetype)
     df_sel <- df() %>% select(input$factors)
-    print(linetype.legend)
+    df_sel[input$factors] <- lapply(df_sel[input$factors], factor)
+    
     if(length(input$factors) > 1){
       categories = levels(df_sel[,2])
       legend_name = names(df_sel)[2]
@@ -204,6 +231,7 @@ shinyServer(function(input, output, session) {
     xlab = input$xlab
     ylab = input$ylab
     lwd = input$linewidth
+    bxwd = input$boxwidth
     cex.axis = input$axis.size
     cex.lab = input$lab.size
     cex.main = input$main.size
@@ -215,9 +243,11 @@ shinyServer(function(input, output, session) {
     linetype = plot.line()
     par(mar = rep(input$margin.size, 4))
 
+    print(linetype$lty)
     plot(surv.data(), conf.int = confidence_interval, col = colors$color, lty = linetype$lty, lwd = lwd, mark.time = mark.time,
         xlab = xlab, ylab = ylab, main = main, log = log,
         cex.axis = cex.axis, cex.lab= cex.lab, cex.main = cex.main)
+    box(lwd = bxwd)
     if(length(colors$color.legend) > 1){
       legend('topright', legend = colors$category, col = colors$color.legend, cex = cex.legend, title = colors$legend_name, lty = 1, bty = 'n')
     }
@@ -250,7 +280,7 @@ shinyServer(function(input, output, session) {
     # },
     content = function(filename){
       # open device
-      pdf(filename)
+      pdf(filename, height = input$plot.height, width = input$plot.width)
       
       # create plot # copy from outside
       # copy code from above
@@ -261,6 +291,7 @@ shinyServer(function(input, output, session) {
       xlab = input$xlab
       ylab = input$ylab
       lwd = input$linewidth
+      bxwd = input$boxwidth
       cex.axis = input$axis.size
       cex.lab = input$lab.size
       cex.main = input$main.size
@@ -275,6 +306,7 @@ shinyServer(function(input, output, session) {
       plot(surv.data(), conf.int = confidence_interval, col = colors$color, lty = linetype$lty, lwd = lwd, mark.time = mark.time,
            xlab = xlab, ylab = ylab, main = main, log = log,
            cex.axis = cex.axis, cex.lab= cex.lab, cex.main = cex.main)
+      box(lwd = bxwd)
       if(length(colors$color.legend) > 1){
         legend('topright', legend = colors$category, col = colors$color.legend, cex = cex.legend, title = colors$legend_name, lty = 1, bty = 'n')
       }

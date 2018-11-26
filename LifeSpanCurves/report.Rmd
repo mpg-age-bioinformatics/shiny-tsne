@@ -19,10 +19,8 @@ params:
   colors: NA
   linetype: NA
   margin.size: NA
-
 ---
-Describe a bit here:
-
+Write. 
 
 <!-- Plot -->
 
