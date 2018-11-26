@@ -7,8 +7,9 @@
 #    http://shiny.rstudio.com/
 #
 
+.libPaths("/srv/shiny-server/LifeSpanCurves/libs")
+
 library(shiny)
-#library(DT)
 library(tidyverse)
 library(survival)
 library(xlsx)
@@ -45,7 +46,7 @@ shinyUI(fluidPage(
                  checkboxInput('longtable', "Table in long format", FALSE),
                  
                  # Input: Checkbox if file has header ----
-                 a(href = "https://github.com/mpg-age-bioinformatics/shiny/blob/master/LifeSpanCurves/lifespan_test.csv", "Example input"),
+                 a(href = "https://github.com/mpg-age-bioinformatics/shiny/blob/master/LifeSpanCurves/input_examples/lifespan_test.tsv", "Example input"),
                  checkboxInput("header", "Header", TRUE),
                  
                  

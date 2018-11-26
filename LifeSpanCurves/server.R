@@ -7,15 +7,15 @@
 #    http://shiny.rstudio.com/
 #
 
-# .libPaths("/srv/shiny-server/LifeSpanCurves/libs")
-# gitversion <- function(){ 
-#   git<-read.csv("/srv/shiny-server/.git/refs/heads/master", header=FALSE)
-#   git<-git$V1
-#   git<-toString(git[1])
-#   git<-substr(git, 1, 7)
-#   return(git)
-# }
-# 
+.libPaths("/srv/shiny-server/LifeSpanCurves/libs")
+gitversion <- function(){
+  git<-read.csv("/srv/shiny-server/.git/refs/heads/master", header=FALSE)
+  git<-git$V1
+  git<-toString(git[1])
+  git<-substr(git, 1, 7)
+  return(git)
+}
+
 
 library(shiny)
 library(tidyverse)
@@ -63,7 +63,7 @@ shinyServer(function(input, output, session) {
   
   output$deaths <- renderUI({
     selectInput(inputId = "death", 
-                       label = "Select deaths/status (long table)", 
+                       label = "Select deaths (status if long format)", 
                        choices = names(df()))
   })
   
@@ -224,7 +224,8 @@ shinyServer(function(input, output, session) {
   })
   
   output$survPlot <- renderPlot({
-
+    req(input$day, input$death)
+    
     # setting the plot titles and styles
     # change here settings here
     main = input$main
@@ -265,6 +266,7 @@ shinyServer(function(input, output, session) {
 
   # print cox proportional hazard model
   output$survStats <- renderPrint({
+    req(input$day, input$death)
     print(summary(cox()))
  })
     
@@ -272,12 +274,10 @@ shinyServer(function(input, output, session) {
     
     
   output$downloadPlot <- downloadHandler(
-    
     # specify file name
-    filename = 'test.pdf',
-    # filename = function() {
-    #   paste(input$outfile,".long.",gitversion(),".csv", sep = "")
-    # },
+    filename = function() {
+      paste(input$outfile,".plot.",gitversion(),".pdf", sep = "")
+    },
     content = function(filename){
       # open device
       pdf(filename, height = input$plot.height, width = input$plot.width)
@@ -303,6 +303,7 @@ shinyServer(function(input, output, session) {
       linetype = plot.line()
       par(mar = rep(input$margin.size, 4))
       
+      print(linetype$lty)
       plot(surv.data(), conf.int = confidence_interval, col = colors$color, lty = linetype$lty, lwd = lwd, mark.time = mark.time,
            xlab = xlab, ylab = ylab, main = main, log = log,
            cex.axis = cex.axis, cex.lab= cex.lab, cex.main = cex.main)
@@ -318,17 +319,16 @@ shinyServer(function(input, output, session) {
     })
   
   output$downloadTable <- downloadHandler(
-    filename = 'test.csv',
-    # filename = function() {
-    #   paste(input$outfile,".long.",gitversion(),".csv", sep = "")
-    # },
+    filename = function() {
+      paste(input$outfile,".long.",gitversion(),".tsv", sep = "")
+    },
     content = function(filename) {
       inFile <- input$uploaded_file
       
       if (is.null(inFile))
         return(NULL)
       if (input$table){
-        write.csv(df_sel(), filename, row.names = FALSE, quote = FALSE, sep = '\t')
+        write.table(df_sel(), filename, row.names = FALSE, quote = FALSE, sep = '\t')
       }
     }
   )
@@ -336,10 +336,9 @@ shinyServer(function(input, output, session) {
   
   output$downloadReport <- downloadHandler(
     # For PDF output, change this to "report.pdf"
-    filename = 'report.pdf',
-    # filename = function() {
-    #   paste(input$outfile,".report.",gitversion(),".pdf", sep = "")
-    # },
+    filename = function() {
+      paste(input$outfile,".report.",gitversion(),".pdf", sep = "")
+    },
     content = function(file) {
       # Copy the report file to a temporary directory before processing it, in
       # case we don't have write permissions to the current working dir (which
