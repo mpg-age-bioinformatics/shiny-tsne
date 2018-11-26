@@ -21,6 +21,9 @@ library(shiny)
 library(tidyverse)
 library(survival)
 library(xlsx)
+library(knitr)
+#library(tinytex)
+
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
@@ -86,9 +89,17 @@ shinyServer(function(input, output, session) {
   df_sel <- reactive({
     if(input$longtable){
       req(input$day, input$death)
-      D.survival <- df() %>% select(input$day, input$death, input$factors)
+      if(is.null(input$factors)){
+        D.survival <- df() %>% select(input$day, input$death)
+      } else {
+        D.survival <- df() %>% select(input$day, input$death, input$factors)
+      }
     } else {
-      df_sel <- df() %>% select(input$day, input$death, input$censor, input$factors)
+      if(is.null(input$factors)){
+        df_sel <- df() %>% select(input$day, input$death, input$censor)
+      } else {
+        df_sel <- df() %>% select(input$day, input$death, input$censor, input$factors)
+      }
       
       D = df_sel
       num_var = length(input$factors)
@@ -124,16 +135,16 @@ shinyServer(function(input, output, session) {
     colors<- input$colors
     color.legend <- gsub(' ', '', colors)
     color.legend <- unlist(strsplit(color.legend, ','))
-    df_sel <- df() %>% select(input$factors)
-    
-    df_sel[input$factors] <- lapply(df_sel[input$factors], factor)
     
     if(length(input$factors) > 0){
+      df_sel <- df() %>% select(input$factors)
+      df_sel[input$factors] <- lapply(df_sel[input$factors], factor)
       categories = levels(df_sel[,1])
     } else {
       categories = '1'
+      df_sel = data.frame('no groups' = 1)
+      
     }
-    
     if(length(categories) < length(color.legend)){
       color.legend <- color.legend[1:length(categories)]
     }
@@ -147,13 +158,15 @@ shinyServer(function(input, output, session) {
   
   plot.line <- reactive({
     linetype.legend <- as.numeric(input$linetype)
-    df_sel <- df() %>% select(input$factors)
-    df_sel[input$factors] <- lapply(df_sel[input$factors], factor)
     
     if(length(input$factors) > 1){
+      df_sel <- df() %>% select(input$factors)
+      df_sel[input$factors] <- lapply(df_sel[input$factors], factor)
       categories = levels(df_sel[,2])
       legend_name = names(df_sel)[2]
     } else if (length(input$factors) == 1){
+      df_sel <- df() %>% select(input$factors)
+      df_sel[input$factors] <- lapply(df_sel[input$factors], factor)
       categories = levels(df_sel[,1])
       legend_name = names(df_sel)[1]
     } else {
@@ -205,7 +218,7 @@ shinyServer(function(input, output, session) {
       rename_variables <- paste('group', 1:num_var, sep = '_')
       plot.data = df_sel()
       names(plot.data) = c('day', 'status', rename_variables)
-      
+    
       # make different models
       if(num_var == 1){
            cox <- coxph(Surv(day,status) ~ ., data= plot.data, method="breslow")
@@ -220,7 +233,7 @@ shinyServer(function(input, output, session) {
         return(NULL)
       }
     }
-    
+  
   })
   
   output$survPlot <- renderPlot({
@@ -337,9 +350,9 @@ shinyServer(function(input, output, session) {
   output$downloadReport <- downloadHandler(
     # For PDF output, change this to "report.pdf"
     filename = function() {
-      paste(input$outfile,".report.",gitversion(),".pdf", sep = "")
+      paste(input$outfile,".report.", gitversion(),".pdf", sep = "")
     },
-    content = function(file) {
+    content = function(filename) {
       # Copy the report file to a temporary directory before processing it, in
       # case we don't have write permissions to the current working dir (which
       # can happen when deployed).
@@ -360,7 +373,7 @@ shinyServer(function(input, output, session) {
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment (this isolates the code in the document
       # from the code in this app).
-      rmarkdown::render(tempReport, output_file = file,
+      rmarkdown::render(tempReport, output_file = filename,
                         params = params,
                         envir = new.env(parent = globalenv())
       )

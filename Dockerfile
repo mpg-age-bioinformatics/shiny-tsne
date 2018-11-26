@@ -46,4 +46,8 @@ RUN apt-get install -yq libxml2-dev && \
     R CMD javareconf
 
 # required for cellplot / devtools
-RUN apt-get install libssl-dev
+RUN apt-get install -yq libssl-dev
+
+# required for downloading reports using Rmarkdown
+RUN apt-get install -yq texlive-latex-base
+    apt-get install -yq texlive-latex-extra

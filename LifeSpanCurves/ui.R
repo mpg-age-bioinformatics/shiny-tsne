@@ -13,6 +13,9 @@ library(shiny)
 library(tidyverse)
 library(survival)
 library(xlsx)
+library(knitr)
+#library(tinytex)
+
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -46,7 +49,7 @@ shinyUI(fluidPage(
                  checkboxInput('longtable', "Table in long format", FALSE),
                  
                  # Input: Checkbox if file has header ----
-                 a(href = "https://github.com/mpg-age-bioinformatics/shiny/blob/master/LifeSpanCurves/input_examples/lifespan_test.tsv", "Example input"),
+                 a(href = "https://github.com/mpg-age-bioinformatics/shiny/blob/master/LifeSpanCurves/input_examples/lifespan_test.csv", "Example input"),
                  checkboxInput("header", "Header", TRUE),
                  
                  
@@ -99,7 +102,7 @@ shinyUI(fluidPage(
     
     # Main panel for displaying outputs ----
     mainPanel(
-      plotOutput("survPlot"),
+      plotOutput("survPlot", width = "600px"),
       hr(),
       verbatimTextOutput("survStats"),
       downloadButton('downloadPlot', 'Download Plot'),

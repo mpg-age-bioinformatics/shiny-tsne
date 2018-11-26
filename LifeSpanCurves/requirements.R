@@ -22,5 +22,16 @@ if(!require(tidyverse)){
   library(tidyverse)
 }
 
+if(!require(tinytex)){
+  install.packages("tinytex", dependencies = TRUE)
+  library(tinytex)
+}
+
+if(!require(knitr)){
+  install.packages("knitr", dependencies = TRUE)
+  library(knitr)
+}
+
+
 
 
