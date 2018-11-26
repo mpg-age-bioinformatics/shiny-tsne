@@ -66,10 +66,10 @@ shinyServer(function(input, output, session) {
     DD[DD == ''] <- NA
 
     vars <- names(DD)
-    updateSelectInput(session, "categories","Select Categories", choices = Categories, selected = "GOTERM_BP_FAT")
-    updateSelectInput(session, "genessel","Select Genes Name/ID Column", choices = vars, selected="GenesSignificant" )
-    updateSelectInput(session, "logfcsel","Select Log2(FC) Column", choices = vars, selected= "log2FoldChange")
-    updateSelectInput(session, "padjsel","Select P Adj. Column", choices = vars, selected="padj")
+    updateSelectInput(session, "categories","Select Categories", choices = Categories)
+    updateSelectInput(session, "genessel","Select Genes Name/ID Column", choices = vars )
+    updateSelectInput(session, "logfcsel","Select Log2(FC) Column", choices = vars)
+    updateSelectInput(session, "padjsel","Select P Adj. Column", choices = vars)
     
     req(input$categories)
     req(input$genessel)
