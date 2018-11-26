@@ -71,7 +71,7 @@ shinyUI(fluidPage(
                  radioButtons('interaction_term', 'Add interaction term', choices = c("no" = FALSE, "yes" = TRUE), inline = TRUE),
                  
                  hr(),
-                 checkboxInput('table', "Show table", FALSE),
+                 checkboxInput('table', "Show table", TRUE),
                  hr(),
                  textInput("outfile", "Output file name", value="Survival"),
                  submitButton('run survival analysis')
