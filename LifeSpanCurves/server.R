@@ -87,8 +87,8 @@ shinyServer(function(input, output, session) {
   # checkbox if already correctly formatted table
   
   df_sel <- reactive({
+    req(input$day, input$death)
     if(input$longtable){
-      req(input$day, input$death)
       if(is.null(input$factors)){
         D.survival <- df() %>% select(input$day, input$death)
       } else {
