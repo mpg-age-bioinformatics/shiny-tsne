@@ -155,7 +155,7 @@ shinyServer(function(input, output, session) {
         num_clust = input$num_clust
       } 
       
-      tree1 = cutree(hclust(dist(as.matrix(heatmap.data$D), method = input$dist), method = input$clust), num_clust)
+      tree1 = cutree(as.hclust(HM$rowDendrogram), num_clust)
       nofclust.height <-  length(unique(as.vector(tree1)));
       selcol2 <- colorRampPalette(colors2)
       clustcol.height = selcol2(nofclust.height)
@@ -170,10 +170,69 @@ shinyServer(function(input, output, session) {
   })
   
   
+  carpet <- reactive({
+    req(input$uploaded_file)
+    D <- plot.heatmap()
+    heatmap.data = heatmap.data()
+      
+    if(input$num_clust > nrow(heatmap.data$D)){
+      num_clust = nrow(heatmap.data$D)
+    } else {
+      num_clust = input$num_clust
+    } 
+      
+    tree1 = cutree(hclust(dist(as.matrix(heatmap.data$D), method = input$dist), method = input$clust, members = heatmap.data$labels), num_clust)
+    tree1 = data.frame(ID = heatmap.data$labels, cluster = tree1)
+      
+    H1_carpet = t(D$carpet)
+    row.names(H1_carpet) <- D$rowInd
+    H1_carpet = merge(H1_carpet, tree1, by = "row.names", sort = FALSE)
+    H1_carpet <- H1_carpet[,c("ID", "cluster", row.names(D$carpet))]
+    H1_carpet <- H1_carpet[rev(row.names(H1_carpet)),c("ID", "cluster", row.names(D$carpet))]
+    names(H1_carpet)[1] <- input$labels
+    H1_carpet
+    
+  })
+
+  
   output$clusterMap <- renderTable({
     if (input$table){
-      D <- plot.heatmap()
+      carpet()
+    }
+  })
+  # download plot
+  
+  output$downloadPlot <- downloadHandler(
+    # specify file name
+    filename = function() {
+      paste(input$outfile,".heatmap.",gitversion(),".pdf", sep = "")
+    },
+    content = function(filename){
+      # open device
+      pdf(filename, height = (input$plot_height/10), width = (input$plot_width/10))
+      
+      
+      if(input$dendro == 'both'){
+        Rowv = TRUE
+        Colv = TRUE
+      } else if (input$dendro == "row"){
+        Rowv = TRUE
+        Colv = FALSE
+      } else if (input$dendro == 'col'){
+        Rowv = FALSE
+        Colv = TRUE
+      } else {
+        Rowv = FALSE
+        Colv = FALSE
+      }
+      # name for color key
+      
       heatmap.data = heatmap.data()
+      HM <- plot.heatmap()
+      
+      colors2 <- input$color2
+      colors2 <- gsub(' ', '', colors2)
+      colors2 <- unlist(strsplit(colors2, ','))
       
       if(input$num_clust > nrow(heatmap.data$D)){
         num_clust = nrow(heatmap.data$D)
@@ -181,17 +240,37 @@ shinyServer(function(input, output, session) {
         num_clust = input$num_clust
       } 
       
-      tree1 = cutree(hclust(dist(as.matrix(heatmap.data$D), method = input$dist), method = input$clust, members = heatmap.data$labels), num_clust)
+      tree1 = cutree(as.hclust(HM$rowDendrogram), num_clust)
+      nofclust.height <-  length(unique(as.vector(tree1)));
+      selcol2 <- colorRampPalette(colors2)
+      clustcol.height = selcol2(nofclust.height)
       
-      print(head(tree1))
+      HM <- heatmap.2(as.matrix(heatmap.data$D),labRow = heatmap.data$labels, trace = 'none', col = plot.color(),
+                      margins = c(input$mar_bottom, input$mar_right), Rowv = Rowv, Colv = Colv, na.color = input$na.color,
+                      dendrogram = input$dendro, key = input$color_key, 
+                      distfun = function(x) dist(x, method = input$dist), 
+                      hclustfun = function(x) hclust(x, method = input$clust), scale = input$heat_scale,
+                      cexRow = input$cex_lab, cexCol = input$cex_lab, RowSideColors = clustcol.height[tree1])
       
-      H1_carpet = t(D$carpet)
-      H1_carpet = merge(H1_carpet, as.matrix(tree1), by = "row.names", sort = FALSE)
+       # close device
+      dev.off()
+    })
+  
+  output$downloadTable <- downloadHandler(
+    filename = function() {
+      paste(input$outfile,".carpet.",gitversion(),".tsv", sep = "")
+    },
+    content = function(filename) {
+      inFile <- input$uploaded_file
+      
+      if (is.null(inFile))
+        return(NULL)
+      if (input$table){
+        write.table(carpet(), filename, row.names = FALSE, quote = FALSE, sep = '\t')
+      }
     }
-  })
+  )
   
-  
-  # download plot
   
   # download cluster
   
