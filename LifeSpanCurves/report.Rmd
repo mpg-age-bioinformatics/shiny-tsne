@@ -21,7 +21,7 @@ params:
   margin.size: NA
 ---
 
-This App uses the `survival` package. For more information read the respective documentation in [cran](https://cran.r-project.org/web/packages/survival/index.html), and wikipedia's entry for [survival analysis](https://en.wikipedia.org/wiki/Survival_analysis).
+This App uses the `survival` package. For more information read the respective documentation in [cran](https://cran.r-project.org/web/packages/survival/index.html).
       
 <!-- Plot -->
 
@@ -61,5 +61,3 @@ This App uses the `survival` package. For more information read the respective d
 ```{r, echo = FALSE}
     print(summary(params$cox))
 ```
-
-Please keep the version tag on all downloaded files.

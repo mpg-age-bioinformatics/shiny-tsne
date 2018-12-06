@@ -112,7 +112,7 @@ shinyServer(function(input, output, session) {
           for(event in 1:D[i,input$death]){
             D.survival[r,c(1,2)] <- c(D[i,input$day], 1)
             if(num_var > 0){
-              D.survival[r, c(3:ncol(D.survival))] <- as.character(D[i, input$factors])
+              D.survival[r, c(3:ncol(D.survival))] <- unlist(lapply(as.vector(D[i,input$factors]), as.character))
             }
             r = r+1
           }
@@ -121,10 +121,15 @@ shinyServer(function(input, output, session) {
           for(event in 1:D[i,input$censor]){
             D.survival[r,c(1,2)] <- c(D[i,input$day], 0)
             if(num_var > 0){
-              D.survival[r, c(3:ncol(D.survival))] <- as.character(D[i, input$factors])
+              D.survival[r, c(3:ncol(D.survival))] <- unlist(lapply(as.vector(D[i,input$factors]), as.character))
             }
             r = r+1
           }
+        }
+      }
+      if(!is.null(input$factors)){
+        for (variable in input$factors) {
+          D.survival[,variable] <- as.factor(D.survival[,variable])
         }
       }
       D.survival
@@ -217,23 +222,30 @@ shinyServer(function(input, output, session) {
     } else {
       rename_variables <- paste('group', 1:num_var, sep = '_')
       plot.data = df_sel()
+      original_names <- names(plot.data)
       names(plot.data) = c('day', 'status', rename_variables)
     
       # make different models
       if(num_var == 1){
            cox <- coxph(Surv(day,status) ~ ., data= plot.data, method="breslow")
+           names(cox$coefficients) <- unlist(lapply(names(cox$coefficients), function(x) gsub('group_1', paste(original_names[3], '_', sep = ''), x)))
       } else if(num_var == 2){
         if(as.logical(input$interaction_term)){
           cox <- coxph(Surv(day,status) ~ . + group_1 * group_2, data= plot.data, method="breslow")
+          names(cox$coefficients) <- unlist(lapply(names(cox$coefficients), function(x) gsub('group_1', paste(original_names[3], '_', sep = '') , x)))
+          names(cox$coefficients) <- unlist(lapply(names(cox$coefficients), function(x) gsub('group_2', paste(original_names[4], '_', sep = '') , x)))
+          
         } else {
-          cox <- coxph(Surv(day,status) ~ ., data= plot.data, method="breslow")
+          cox <- coxph(Surv(day,status) ~ ., data = plot.data, method="breslow")
+          names(cox$coefficients) <- unlist(lapply(names(cox$coefficients), function(x) gsub('group_1', paste(original_names[3], '_', sep = '') , x)))
+          names(cox$coefficients) <- unlist(lapply(names(cox$coefficients), function(x) gsub('group_2', paste(original_names[4], '_', sep = '') , x)))
         }
       } else if (num_var >= 3){
         print(paste("You have selected", num_var, "variables\nPlease select only 2 or less"))
         return(NULL)
       }
+      cox
     }
-  
   })
   
   output$survPlot <- renderPlot({
@@ -281,7 +293,31 @@ shinyServer(function(input, output, session) {
   output$survStats <- renderPrint({
     req(input$day, input$death)
     print(summary(cox()))
- })
+    
+    if(length(input$factors) > 1){
+        df_sel <- df() %>% select(input$factors)
+        df_sel[input$factors] <- lapply(df_sel[input$factors], factor)
+        categories1 = levels(df_sel[,1])
+        group1 = names(df_sel)[1]
+        categories2 = levels(df_sel[,2])
+        group2 = names(df_sel)[2]
+        
+        print(paste(group1, "has the following levels:", paste(categories1, collapse = ', ' ) , sep = " "))
+        print(paste(group2, "has the following levels:", paste(categories2, collapse = ', ' ) , sep = " "))
+        
+      } else if (length(input$factors) == 1){
+        df_sel <- df() %>% select(input$factors)
+        df_sel[input$factors] <- lapply(df_sel[input$factors], factor)
+        categories1 = levels(df_sel[,1])
+        group1 = names(df_sel)[1]
+
+        print(paste(group1, "has the following levels:", paste(categories1, collapse = ', ' ) , sep = " "))
+        
+      } else {
+        print("No variables were provided")
+      }
+  
+    })
     
     
     

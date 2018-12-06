@@ -1,4 +1,4 @@
-# install libraries for VennDiagram
+# install libraries for LifeSpanCurves
 
 .libPaths("/srv/shiny-server/LifeSpanCurves/libs")
 
