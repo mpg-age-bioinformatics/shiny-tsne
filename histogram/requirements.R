@@ -5,4 +5,7 @@ if(!require(futile.logger)){
   library(futile.logger)
 }
   
-  
+if(!require(xlsx)){
+  install.packages("xlsx", dependencies = TRUE)
+  library(xlsx)
+}

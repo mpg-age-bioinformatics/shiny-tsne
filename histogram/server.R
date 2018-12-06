@@ -7,6 +7,8 @@ gitversion <- function(){
   return(git)
 }
 library(shiny)
+library(xlsx)
+
 futile.logger::flog.threshold(futile.logger::ERROR, name = "HistogramLogger")
 
 # Define server logic required to draw a histogram
