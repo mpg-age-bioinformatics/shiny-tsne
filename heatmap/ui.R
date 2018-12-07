@@ -18,7 +18,7 @@ library(tidyverse)
 shinyUI(fluidPage(
   
   # App title ----
-  titlePanel(title = h1("Generate a heatmap", align = "left")),
+  titlePanel("Heatmap"),
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
