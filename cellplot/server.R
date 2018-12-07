@@ -66,17 +66,24 @@ shinyServer(function(input, output, session) {
     DD[DD == ''] <- NA
 
     vars <- names(DD)
-    updateSelectInput(session, "categories","Select Categories", choices = Categories)
-    updateSelectInput(session, "genessel","Select Genes Name/ID Column", choices = vars )
-    updateSelectInput(session, "logfcsel","Select Log2(FC) Column", choices = vars)
-    updateSelectInput(session, "padjsel","Select P Adj. Column", choices = vars)
+    if (is.null(input$categories)){
+      updateSelectInput(session, "categories","Select Categories", choices = Categories, selected = NULL)
+    }
+    if ( input$genessel == ""){
+      updateSelectInput(session, "genessel","Select Genes Name/ID Column", choices = vars, selected = NULL )
+    }
+    if (input$logfcsel == ""){
+      updateSelectInput(session, "logfcsel","Select Log2(FC) Column", choices = vars, selected = NULL)
+    }
+    if (input$padjsel == ""){
+      updateSelectInput(session, "padjsel","Select P Adj. Column", choices = vars, selected = NULL)
+    }
     
-    req(input$categories)
-    req(input$genessel)
-    req(input$logfcsel)
-    req(input$padjsel)
+    req(!is.null(input$categories))
+    req( input$genessel != "") 
+    req( input$logfcsel != "") 
+    req( input$padjsel != "")
     
-    #refcol<-input$genessel
     siggenes<-DD[input$genessel]
     DD['GenesSignificant']<-siggenes
     #dput(DD,"/srv/shiny-server/cellplot/test.ref.R")
