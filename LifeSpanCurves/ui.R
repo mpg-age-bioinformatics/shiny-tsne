@@ -21,7 +21,7 @@ library(knitr)
 shinyUI(fluidPage(
   
   # App title ----
-  titlePanel(title = h1("Run a Survival Analysis", align = "left")),
+  titlePanel("Run a Survival Analysis"),
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
