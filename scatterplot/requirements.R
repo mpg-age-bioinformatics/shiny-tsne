@@ -15,6 +15,11 @@ if(!require(ggplot2)){
   library(ggplot2)
 }
 
+if(!require(tidyverse)){
+  install.packages("tidyverse", dependencies = TRUE)
+  library(tidyverse)
+}
+
 quit(save="no")
 
 
