@@ -1,0 +1,6 @@
+S3method("$", GlobalOptionsFun)
+S3method("$<-", GlobalOptionsFun)
+export(setGlobalOptions)
+
+import("methods")
+
