@@ -214,6 +214,7 @@ shinyServer(function(input, output, session) {
   
   carpet <- reactive({
     req(input$uploaded_file)
+    #pdf(NULL)
     D <- plot.heatmap()
     heatmap.data = heatmap.data()
     
@@ -234,12 +235,13 @@ shinyServer(function(input, output, session) {
     names(H1_carpet)[1] <- input$labels
     H1_carpet$heatmap_order <- seq(1:nrow(H1_carpet))
     H1_carpet
-    
+    #dev.off()
   })
   
   
   carpet.filtered <- reactive({
     req(input$uploaded_file)
+    #pdf(NULL)
     D <- plot.heatmap.filtered()
     
     if(is.null(input$filter_cluster) | ("all" %in% input$filter_cluster & genes() == "all")){
@@ -287,7 +289,7 @@ shinyServer(function(input, output, session) {
     names(H1_carpet)[1] <- input$labels
     H1_carpet$heatmap_order <- seq(1:nrow(H1_carpet))
     H1_carpet
-    
+    #dev.off()
   })
   
   
@@ -371,22 +373,26 @@ shinyServer(function(input, output, session) {
   
   output$clusterMap <- DT::renderDataTable({
     if(input$table)
+      #pdf(NULL)
       datatable(
         carpet(),
         selection = list(mode = "multiple"),
         caption = "Heatmap Carpet",
         options = list(pageLength = nrow(carpet()))
       )
+      #dev.off()
   })
   
   output$clusterMap2 <- DT::renderDataTable({
     if(input$table)
+      #pdf(NULL)
       datatable(
         carpet.filtered(),
         selection = list(mode = "multiple"),
         caption = "Heatmap Carpet",
         options = list(pageLength = nrow(carpet()))
       )
+      #dev.off()
   })
   
   
