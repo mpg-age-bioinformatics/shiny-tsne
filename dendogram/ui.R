@@ -22,7 +22,7 @@ shinyUI( fluidPage(
                                                                                 'semicolon-separated' = ';'), inline = TRUE),
       checkboxInput("header", "Header", TRUE),
       selectInput("column", "Select labels column", choices = NULL,selected=NULL),
-      helpText(a(href = "https://raw.githubusercontent.com/mpg-age-bioinformatics/shiny/master/histogram/chol.txt", "Example input")),
+      helpText(a(href = "https://github.com/mpg-age-bioinformatics/shiny/blob/master/heatmap/heatmap_example.csv", "Example input")),
       hr(),
       checkboxInput("circular", "Circular", FALSE),
       uiOutput("trackheight"),
