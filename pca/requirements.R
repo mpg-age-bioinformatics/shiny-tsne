@@ -83,7 +83,11 @@ gg
 mtcars.pca <- prcomp(tdf, center = TRUE,scale. = TRUE)
 summary(mtcars.pca)
 str(mtcars.pca)
-ggbiplot(mtcars.pca)
+p<-ggbiplot(mtcars.pca)
+layer_scales(p)$x$range$range[1]
+
+
+
 # remove arrows
 options(repr.plot.width=10, repr.plot.height=8)
 ggbiplot(mtcars.pca,var.axes=FALSE ) #+  geom_point() + coord_equal()
@@ -105,6 +109,24 @@ ggbiplot(mtcars.pca, var.axes=FALSE, ellipse=TRUE, labels=rownames(tdf), groups=
   #theme(legend.position = "bottom")
 scale_colour_manual(name="Origin", values= c("forest green", "red3", "dark blue")) +
   
+  # xlow=layer_scales(p)$x$range$range[1]
+  # xupper=layer_scales(p)$x$range$range[2]
+  # ylow=layer_scales(p)$y$range$range[1]
+  # yupper=layer_scales(p)$y$range$range[2]
+  # if (!is.na(input$lowerx)){
+  #   xlow=input$lowerx
+  # }
+  # if (!is.na(input$upperx)){
+  #   xupper=input$upperx
+  # }
+# if (!is.na(input$lowery)){
+#   ylow=input$lowery
+# }
+# if (!is.na(input$uppery)){
+#   yupper=input$uppery
+# }
+# p <- p+xlim(xlow, xupper) + ylim(ylow, yupper) 
+  
 # scaling - not really sure on what it's doing or not
 ggbiplot(mtcars.pca, var.axes=FALSE, ellipse=TRUE, labels=rownames(mtcars), groups=mtcars.country, choices=c(3,4), obs.scale = 0.5, var.scale = 4) + 
   
@@ -121,6 +143,14 @@ ggbiplot(mtcars.pca, var.axes=FALSE, ellipse=TRUE, labels=rownames(mtcars), grou
 
 View(mtcars[,c(1:7,10,11)])
 
+
+ellipse = FALSE
+ellipse.prob = 0.68
+labels.size = 3, 
+alpha = 1,
+varname.size = 3,
+varname.adjust = 1.5
+varname.abbrev = FALSE
 
 
 

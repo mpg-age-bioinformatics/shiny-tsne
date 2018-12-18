@@ -82,13 +82,53 @@ shinyServer(function(input, output, session) {
     }
     return(gg)
   })
-    
+  
+  data.names<-reactive({
+    if (input$names) {
+      sample.names<-rownames(plot.data())
+    } else {
+      sample.names<-NULL
+    }
+    return(sample.names)
+  })
+  
   output$PCA <- renderPlot({
-    pplot<-ggbiplot(pca.data(), var.axes=input$arrows, ellipse=input$ellipse, labels=rownames(plot.data()), choices=c(input$x,input$y), groups= groups.data()) + 
+    pplot<-ggbiplot(pca.data(), var.axes=input$arrows, ellipse=input$ellipse, 
+                    labels=data.names(), choices=c(input$x,input$y), groups= groups.data(),
+                    ellipse.prob=input$ellipse.prob, labels.size=input$labelssize,
+                    alpha=input$alpha, varname.size=input$varname.size,
+                    varname.adjust=input$varname.adjust, varname.abbrev=input$varname.abbrev) + 
       ggtitle(input$title) + theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), plot.title = element_text(hjust = 0.5) , aspect.ratio = 1) 
+    if (! input$colors == "") {
+      #print(input$colors)
+      dcolor <- input$colors
+      dcolor <- gsub(' ', '', dcolor)
+      dcolor <- unlist(strsplit(dcolor, ','))
+      pplot<-pplot+scale_colour_manual(name=input$groups, values= dcolor)
+    }
+    
+    xlow=layer_scales(pplot)$x$range$range[1]
+    xupper=layer_scales(pplot)$x$range$range[2]
+    ylow=layer_scales(pplot)$y$range$range[1]
+    yupper=layer_scales(pplot)$y$range$range[2]
+    if (!is.na(input$lowerx)){
+     xlow=input$lowerx
+    }
+    if (!is.na(input$upperx)){
+     xupper=input$upperx
+    }
+    if (!is.na(input$lowery)){
+     ylow=input$lowery
+    }
+    if (!is.na(input$uppery)){
+     yupper=input$uppery
+    }
+    pplot <- pplot+xlim(xlow, xupper) + ylim(ylow, yupper) 
     pplot
   })
+  
+  
   
   output$dendogram <- renderPlot({
     dend<-plot.data()
