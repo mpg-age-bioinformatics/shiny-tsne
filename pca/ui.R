@@ -62,13 +62,12 @@ shinyUI( fluidPage(
       plotOutput("PCA", height = '500px', width = 'auto'),
       downloadButton('downloadPlot', 'Download Plot'),
       br(), br(),
-      p("This App uses R's ", code('dist'), " and ",  code('hclust')," function. For more information read the respective documentation in rdocumentation.org",
-        a("(dist", href = "https://www.rdocumentation.org/packages/proxy/versions/0.4-22/topics/dist"),
+      p("This App uses R's ", code('prcomp'), " and the ggbiplot package function. For more information read the respective documentation in rdocumentation.org",
+        a("(prcomp", href = "https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prcomp.html"),
         "and",
-        a("hclust)", href = "https://www.rdocumentation.org/packages/stats/versions/3.5.1/topics/hclust"),
-        "and wikipedia's entries for ", a("dendogram",href="https://en.wikipedia.org/wiki/Dendrogram" ),
-        "and",
-        a("cluster analysis.",href="https://en.wikipedia.org/wiki/Cluster_analysis" )),
+        a("ggbiplot)", href = "https://www.rdocumentation.org/packages/ggbiplot/versions/0.55/topics/ggbiplot"),
+        "and wikipedia's entry for ", a("pca",href="https://en.wikipedia.org/wiki/Principal_component_analysis" ),
+        "."),
       p("Please keep the version tag on all downloaded files."),
       htmlOutput('appversion')
       )
