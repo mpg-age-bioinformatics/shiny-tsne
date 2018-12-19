@@ -41,10 +41,6 @@ shinyUI( fluidPage(
           sliderInput('alpha', 'Alpha', min = 0, max = 1, value = 1, step = 0.01),
           sliderInput('varname.size', 'Variable name size', min = 0, max = 5, value = 3, step = 0.01),
           sliderInput('varname.adjust', 'Variable name adjust', min = 0, max = 5, value = 1.5, step = 0.01),
-          #uiOutput("trackheight"),
-          #selectInput("distance", "Select distance metric", choices = distmeths ,selected="euclidean"),
-          #selectInput("algor", "Select clustering algorithm", choices = clusteralgs, selected="ward.D2"),
-          #numericInput("clusters", "Number of clusters", 1),
           textInput("colors", "Clusters colors", value=NULL),
           textInput("groups", "Groups names", value="Groups"),
           numericInput("lowerx", "X-axis lower limit", value = NA),
@@ -52,9 +48,6 @@ shinyUI( fluidPage(
           numericInput("lowery", "Y-axis lower limit", value = NA),
           numericInput("uppery", "Y-axis upper limit", value = NA),
           textInput("title", "PCA title", value="PCA")
-          #sliderInput('textsize', 'Select text size', min = 0, max = 5, value = 1, step = 0.1),
-          #sliderInput('labelssize', 'Select labels size', min = 0, max = 5, value = 1, step = 0.1),
-          #submitButton('generate plot')
         )
       )
     ),
