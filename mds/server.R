@@ -78,7 +78,7 @@ shinyServer(function(input, output, session) {
   mds.data <- reactive({
     D.mds<- plot.data()
     D.mds<- D.mds %>%
-      dist() %>%          
+      dist(method=input$method) %>%          
       cmdscale(k=input$dimension) %>%
       as_tibble()
     
