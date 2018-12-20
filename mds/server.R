@@ -141,6 +141,7 @@ shinyServer(function(input, output, session) {
      yupper=input$uppery
     }
     pplot <- pplot+xlim(xlow, xupper) + ylim(ylow, yupper) 
+    pplot <- pplot + theme(plot.title = element_text(hjust = 0.5) , aspect.ratio = 1)
     pplot
   })
   
@@ -153,9 +154,6 @@ shinyServer(function(input, output, session) {
       paste0(input$outfile,".",gitversion(),'.pdf')
     },
     content = function(filename){
-      # open device
-      pdf(filename)
-      # plot
       if (input$cluster > 1 ) {
         pplot<-ggscatter(mds.data(), x = input$x, y = input$y, 
                          label = data.names(),
@@ -192,10 +190,16 @@ shinyServer(function(input, output, session) {
       if (!is.na(input$uppery)){
         yupper=input$uppery
       }
-      pplot <- pplot+xlim(xlow, xupper) + ylim(ylow, yupper) 
+      pplot <- pplot + xlim(xlow, xupper) + ylim(ylow, yupper) 
+      pplot <- pplot + theme(plot.title = element_text(hjust = 0.5) , aspect.ratio = 1)
       pplot
+
+      # open device
+      #pdf(filename)
+      # plot
+      ggsave(filename)
       # close device
-      dev.off()
+      #dev.off()
     }
   )
   

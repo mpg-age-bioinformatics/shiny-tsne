@@ -138,9 +138,7 @@ shinyServer(function(input, output, session) {
       paste0(input$outfile,".",gitversion(),'.pdf')
     },
     content = function(filename){
-      
-      # open device
-      pdf(filename)
+
       # plot
       pplot<-ggbiplot(pca.data(), var.axes=input$arrows, ellipse=input$ellipse, 
                       labels=data.names(), choices=c(input$x,input$y), groups= groups.data(),
@@ -175,8 +173,12 @@ shinyServer(function(input, output, session) {
       }
       pplot <- pplot+xlim(xlow, xupper) + ylim(ylow, yupper) 
       pplot
+      # open device
+      #pdf(filename)
+      # plot
+      ggsave(filename)
       # close device
-      dev.off()
+      #dev.off()
     }
   )
   
