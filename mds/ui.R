@@ -54,7 +54,7 @@ shinyUI( fluidPage(
       p("This App uses R's ", code('dist'), ",", code('cmdscale'), "and", code('kmeans') ,". For more information read the respective documentation in the R-manual",
         a("(dist", href = "https://stat.ethz.ch/R-manual/R-devel/library/stats/html/dist.html"),
         ",",
-        a("cmdscale)", href = "https://stat.ethz.ch/R-manual/R-devel/library/stats/html/cmdscale.html"),
+        a("cmdscale", href = "https://stat.ethz.ch/R-manual/R-devel/library/stats/html/cmdscale.html"),
         "and",
         a("kmeans)", href = "https://stat.ethz.ch/R-manual/R-devel/library/stats/html/kmeans.html"),
         
