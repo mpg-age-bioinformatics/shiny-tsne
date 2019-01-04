@@ -36,7 +36,7 @@ shinyUI( fluidPage(
           numericInput("max_iter", "Max iterations", value = 500),
           radioButtons("pca", "PCA", choices = c("yes" = TRUE, "no" = FALSE), selected = TRUE, inline = TRUE),
           uiOutput("factors"),
-          helpText(a(href = "https://raw.githubusercontent.com/mpg-age-bioinformatics/shiny/master/tsne/train.csv", "Example input")),
+          helpText(a(href = "https://raw.githubusercontent.com/mpg-age-bioinformatics/shiny-tsne/master/train.csv", "Example input")),
           hr(),
           textInput("outfile", "Output file name", value="tSNE")#,
           #submitButton('generate plot')
